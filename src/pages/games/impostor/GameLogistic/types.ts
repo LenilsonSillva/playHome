@@ -13,8 +13,9 @@ export type ImpostorGameState = {
   phase: "reveal" | "discussion" | "voting" | "result";
 };
 
-export type GameOptions = {
-  impostorCount: number;
+export type GameData = {
+  allPlayers: GlobalPlayer[];
+  howManyImpostors: number;
   twoWordsMode: boolean;
   impostorHasHint: boolean;
   selectedCategories: string[];

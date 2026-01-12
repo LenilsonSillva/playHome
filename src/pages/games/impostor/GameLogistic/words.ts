@@ -7,6 +7,8 @@ export type WordData = {
   hint?: string;
 };
 
+// Categorias: "Animais", "Frutas", "Plantas", "Natureza", "Objetos", "Comida", "Filmes e Séries", "Esportes", "Famosos", "Emoções", "Lugares", "Países e Cidades", "Video Games", "Marcas", "Personagens", "Músicas", "Jogos"
+
 export const WORDS: WordData[] = [
   // Animais
   {

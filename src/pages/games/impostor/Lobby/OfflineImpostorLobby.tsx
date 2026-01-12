@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { usePlayers } from "../../../../contexts/contextHook";
-import {
-  createImpostorPlayers,
-  getImpostorCount,
-} from "../GameLogistic/gameLogistic";
+import { getImpostorCount, initializeGame } from "../GameLogistic/gameLogistic";
 import { useNavigate } from "react-router-dom";
 
 export function OfflineImpostorLobby() {
@@ -46,9 +43,31 @@ export function OfflineImpostorLobby() {
   // Função para iniciar o jogo
 
   function startGame() {
-    const allPlayers = createImpostorPlayers(players, selectImpostorNumbers);
-
-    console.log("Iniciando jogo com jogadores:", allPlayers);
+    const allPlayers = initializeGame(
+      players,
+      selectImpostorNumbers,
+      twoGroups,
+      impostorHint,
+      [
+        "Animais",
+        "Frutas",
+        "Plantas",
+        "Natureza",
+        "Objetos",
+        "Comida",
+        "Filmes e Séries",
+        "Esportes",
+        "Famosos",
+        "Emoções",
+        "Lugares",
+        "Países e Cidades",
+        "Video Games",
+        "Marcas",
+        "Personagens",
+        "Músicas",
+        "Jogos",
+      ],
+    );
 
     navigate("/games/impostor/offline", {
       state: {
