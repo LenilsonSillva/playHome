@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { usePlayers } from "../../../../contexts/contextHook";
 import { getImpostorCount, initializeGame } from "../GameLogistic/gameLogistic";
 import { useNavigate } from "react-router-dom";
+import { categories } from "../GameLogistic/words";
+import type { GameRouteState } from "../GameLogistic/types";
 
 export function OfflineImpostorLobby() {
   const navigate = useNavigate();
@@ -10,7 +12,10 @@ export function OfflineImpostorLobby() {
   const maxImpostors = getImpostorCount(players.length);
   const [selectImpostorNumbers, setSelectImpostorNumbers] = useState(1);
   const [twoGroups, setTwoGroups] = useState<boolean>(false);
+  const [categorie, setCategorie] = useState<string[]>(categories);
   const [impostorHint, setImpostorHint] = useState<boolean>(false);
+  const [whoStart, setWhoStart] = useState<boolean>(false);
+  const [impostorCanStart, setImpostorCanStart] = useState<boolean>(false);
 
   // Função para adicionar um jogador à lista
 
@@ -24,6 +29,20 @@ export function OfflineImpostorLobby() {
 
   function handleTwoGroupsChange(event: React.ChangeEvent<HTMLInputElement>) {
     setTwoGroups(event.target.checked);
+  }
+
+  function handleWhoStart(event: React.ChangeEvent<HTMLInputElement>) {
+    setWhoStart(event.target.checked);
+  }
+
+  function handleImpostorCanStart(event: React.ChangeEvent<HTMLInputElement>) {
+    setImpostorCanStart(event.target.checked);
+  }
+
+  function handleCategorie(cat: string) {
+    categorie.includes(cat)
+      ? setCategorie((prev) => prev.filter((item) => item !== cat))
+      : setCategorie((prev) => [...prev, cat]);
   }
 
   // Função para lidar com a mudança do checkbox de dica do impostor
@@ -43,38 +62,30 @@ export function OfflineImpostorLobby() {
   // Função para iniciar o jogo
 
   function startGame() {
-    const allPlayers = initializeGame(
+    const allData = initializeGame(
       players,
       selectImpostorNumbers,
       twoGroups,
       impostorHint,
-      [
-        "Animais",
-        "Frutas",
-        "Plantas",
-        "Natureza",
-        "Objetos",
-        "Comida",
-        "Filmes e Séries",
-        "Esportes",
-        "Famosos",
-        "Emoções",
-        "Lugares",
-        "Países e Cidades",
-        "Video Games",
-        "Marcas",
-        "Personagens",
-        "Músicas",
-        "Jogos",
-      ],
+      categorie,
+      whoStart,
+      impostorCanStart,
     );
 
-    navigate("/games/impostor/offline", {
-      state: {
-        players: allPlayers,
-        phase: "reveal",
-      },
-    });
+    if (allData !== undefined) {
+      navigate("/games/impostor/offline", {
+        state: {
+          players: allData.allPlayers,
+          howManyImpostors: allData.howManyImpostors,
+          impostorCanStart: allData.impostorCanStart,
+          impostorHint: allData.impostorHasHint,
+          selectedCategories: allData.selectedCategories,
+          twoWordsMode: allData.twoWordsMode,
+          whoStart: allData.whoStart,
+          phase: "reveal",
+        } satisfies GameRouteState,
+      });
+    }
   }
 
   return (
@@ -122,24 +133,53 @@ export function OfflineImpostorLobby() {
         </button>
       </div>
       <div>
-        <label>Dois grupos cada um com uma palavra similar a outra:</label>
+        <label>Dois grupos cada um com uma palavra similar a outra: </label>
         <label>
           <input
             type="checkbox"
             checked={twoGroups}
             onChange={handleTwoGroupsChange}
           />
-          Ativar
+          Ativar -
         </label>
-        <label>Impostor tem dica:</label>
+        <label>Impostor tem dica: </label>
         <label>
           <input
             type="checkbox"
             checked={impostorHint}
             onChange={handleImpostorHintChange}
           />
-          Ativar
+          Ativar -
         </label>
+        <label>Selecionar aleatoriamente quem inicia: </label>
+        <label>
+          <input type="checkbox" checked={whoStart} onChange={handleWhoStart} />
+          Ativar -
+        </label>
+        <label>Impostor pode iniciar a rodada: </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={impostorCanStart}
+            onChange={handleImpostorCanStart}
+          />
+          Ativar -
+        </label>
+      </div>
+      <div>
+        {categories.map((cat, index) => {
+          return (
+            <div key={index}>
+              <p>{cat}</p>
+              <input
+                type="checkbox"
+                checked={categorie.includes(cat) ? true : false}
+                value={cat}
+                onChange={() => handleCategorie(cat)}
+              />
+            </div>
+          );
+        })}
       </div>
       <div>
         <button onClick={startGame} disabled={players.length < 3}>

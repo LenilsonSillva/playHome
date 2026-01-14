@@ -40,6 +40,25 @@ function createImpostorPlayers(
   }));
 }
 
+function selectWhoStart(
+  playersData: ImpostorPlayer[],
+  whoStartButton: boolean,
+  impostorCanStart: boolean,
+): string | undefined {
+  const getWhoStart = pickRandom(playersData);
+
+  if (whoStartButton) {
+    if (getWhoStart.isImpostor && !impostorCanStart) {
+      const data = selectWhoStart(
+        playersData,
+        whoStartButton,
+        impostorCanStart,
+      );
+      return data;
+    } else return getWhoStart.name;
+  }
+}
+
 // Seleciona as palavras para os jogadores e escolhe as dicas do impostor
 
 function pickRandom<T>(array: T[]): T {
@@ -120,13 +139,15 @@ export function initializeGame(
   twoWordsMode: boolean,
   impostorHasHint: boolean,
   selectedCategories: string[],
+  whoStartButton: boolean,
+  impostorCanStart: boolean,
 ): GameData {
   const impostorTrueOrFalse = createImpostorPlayers(
     allPlayers,
     howManyImpostors,
   );
 
-  const selectWordedPlayers = distributeWords(
+  const setWordAndData = distributeWords(
     impostorTrueOrFalse,
     twoWordsMode,
     selectedCategories,
@@ -135,11 +156,19 @@ export function initializeGame(
     howManyImpostors,
   );
 
+  const setWhoStart = selectWhoStart(
+    setWordAndData,
+    whoStartButton,
+    impostorCanStart,
+  );
+
   return {
-    allPlayers: selectWordedPlayers,
+    allPlayers: setWordAndData,
     howManyImpostors,
     twoWordsMode,
     impostorHasHint,
     selectedCategories,
+    whoStart: setWhoStart,
+    impostorCanStart,
   };
 }

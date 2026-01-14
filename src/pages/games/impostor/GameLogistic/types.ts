@@ -14,9 +14,22 @@ export type ImpostorGameState = {
 };
 
 export type GameData = {
-  allPlayers: GlobalPlayer[];
+  allPlayers: ImpostorPlayer[];
   howManyImpostors: number;
   twoWordsMode: boolean;
   impostorHasHint: boolean;
   selectedCategories: string[];
+  whoStart?: string;
+  impostorCanStart: boolean;
+};
+
+export type GameRouteState = {
+  players: ImpostorPlayer[];
+  howManyImpostors: number;
+  impostorCanStart: boolean;
+  impostorHint: boolean;
+  selectedCategories: string[];
+  twoWordsMode: boolean;
+  whoStart: string | undefined;
+  phase: string;
 };
