@@ -3,8 +3,6 @@ import Home from "../pages/home";
 import { Impostor } from "../pages/games/impostor";
 import { OfflineImpostorGame } from "../pages/games/impostor/OffLineImpostor";
 import { OnlineImpostorGame } from "../pages/games/impostor/OnlineImpostor";
-import { RevealPhase } from "../pages/games/impostor/OffLineImpostor/revealPhase";
-import { DiscussPhase } from "../pages/games/impostor/OffLineImpostor/discussPhase";
 
 export function AppRoutes() {
   return (
@@ -18,8 +16,7 @@ export function AppRoutes() {
           element={<OfflineImpostorGame />}
         />
         <Route path="/games/impostor/online" element={<OnlineImpostorGame />} />
-        <Route path="/games/impostor/revealPhase" element={<RevealPhase />} />
-        <Route path="/games/impostor/discussPhase" element={<DiscussPhase />} />
+        {/* As fases RevealPhase, DiscussPhase, VotingPhase e EliminationPhase são usadas dentro do OfflineImpostorGame e não devem ser acessadas diretamente por rota. */}
       </Routes>
     </BrowserRouter>
   );

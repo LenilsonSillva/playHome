@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
-import type { ImpostorPlayer } from "../../GameLogistic/types";
+import type {
+  GameRouteState,
+  ImpostorGameState,
+} from "../../GameLogistic/types";
+type DiscussPhaseProps = {
+  data: GameRouteState["data"];
+  onNextPhase: (phase: ImpostorGameState["phase"]) => void;
+};
 
-export function DiscussPhase(state: any) {
+export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
   const [seconds, setSeconds] = useState(0);
+  const [nextPhase, setNextPhase] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,6 +27,14 @@ export function DiscussPhase(state: any) {
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   }
 
+  useEffect(()=>{
+    if (nextPhase === "voting") {
+    onNextPhase(nextPhase);
+  } else if (nextPhase === "elimination") {
+    onNextPhase(nextPhase);
+  }
+  }),[onNextPhase, nextPhase]
+
   return (
     <div className="discussion-screen">
       <h1>Discussão</h1>
@@ -27,26 +43,26 @@ export function DiscussPhase(state: any) {
 
       <p>JOGADORES VIVOS: </p>
       <ul>
-        {state.data.players.map((p: ImpostorPlayer) => {
-          if (p.isAlive) {
-            return <li key={p.id}>{p.name}</li>;
-          } else null;
-        })}
+        {data.players
+          .filter((p) => p.isAlive)
+          .map((p) => (
+            <li key={p.id}>{p.name}</li>
+          ))}
       </ul>
       <div>
-        {state.data.whoStart === undefined ? null : (
-          <p>{state.data.whoStart} começa o jogo.</p>
+        {data.whoStart === undefined ? null : (
+          <p>{data.whoStart} começa o jogo.</p>
         )}
       </div>
       <p>
-        {state.data.howManyImpostors === 1
+        {data.howManyImpostors === 1
           ? "Existe 1 impostor"
-          : "Existem " + state.data.howManyImpostors + " impostores"}
-        {!state.impostorHint ? " com dica." : null}
+          : "Existem " + data.howManyImpostors + " impostores"}
+        {data.impostorHint ? " com dica." : null}
       </p>
 
-      <button>Ir para votação</button>
-      <button>Pular Votação</button>
+      <button onClick={() => setNextPhase("voting")}>Ir para votação</button>
+      <button onClick={() => setNextPhase("elimination")}>Pular Votação</button>
     </div>
   );
 }

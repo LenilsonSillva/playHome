@@ -6,11 +6,12 @@ export type ImpostorPlayer = GlobalPlayer & {
   word: string | null;
   vote?: string;
   hint?: string;
+  score: number | null;
 };
 
 export type ImpostorGameState = {
   players: ImpostorPlayer[];
-  phase: "reveal" | "discussion" | "voting" | "result";
+  phase: "reveal" | "discussion" | "voting" | "elimination" | "result";
 };
 
 export type GameData = {
@@ -24,12 +25,14 @@ export type GameData = {
 };
 
 export type GameRouteState = {
-  players: ImpostorPlayer[];
-  howManyImpostors: number;
-  impostorCanStart: boolean;
-  impostorHint: boolean;
-  selectedCategories: string[];
-  twoWordsMode: boolean;
-  whoStart: string | undefined;
-  phase: string;
+  data: {
+    players: ImpostorPlayer[];
+    howManyImpostors: number;
+    impostorCanStart: boolean;
+    impostorHint: boolean;
+    selectedCategories: string[];
+    twoWordsMode: boolean;
+    whoStart: string | undefined;
+    phase: ImpostorGameState["phase"];
+  };
 };

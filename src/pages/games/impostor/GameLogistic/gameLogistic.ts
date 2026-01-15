@@ -37,6 +37,7 @@ function createImpostorPlayers(
     isImpostor: impostorIds.includes(p.id),
     isAlive: true,
     word: null,
+    score: 0
   }));
 }
 

@@ -75,14 +75,16 @@ export function OfflineImpostorLobby() {
     if (allData !== undefined) {
       navigate("/games/impostor/offline", {
         state: {
-          players: allData.allPlayers,
-          howManyImpostors: allData.howManyImpostors,
-          impostorCanStart: allData.impostorCanStart,
-          impostorHint: allData.impostorHasHint,
-          selectedCategories: allData.selectedCategories,
-          twoWordsMode: allData.twoWordsMode,
-          whoStart: allData.whoStart,
-          phase: "reveal",
+          data: {
+            players: allData.allPlayers,
+            howManyImpostors: allData.howManyImpostors,
+            impostorCanStart: allData.impostorCanStart,
+            impostorHint: allData.impostorHasHint,
+            selectedCategories: allData.selectedCategories,
+            twoWordsMode: allData.twoWordsMode,
+            whoStart: allData.whoStart,
+            phase: "reveal",
+          },
         } satisfies GameRouteState,
       });
     }

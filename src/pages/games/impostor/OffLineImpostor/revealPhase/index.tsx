@@ -1,20 +1,29 @@
-import { useState } from "react";
-import { OfflineImpostorGame } from "..";
+import { useEffect, useState } from "react";
+import type {
+  GameRouteState,
+  ImpostorGameState,
+} from "../../GameLogistic/types";
+type DiscussPhaseProps = {
+  data: GameRouteState["data"];
+  onNextPhase: (phase: ImpostorGameState["phase"]) => void;
+};
 
-export function RevealPhase(state: any) {
+export function RevealPhase({ data, onNextPhase }: DiscussPhaseProps) {
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const player = state.data.players[index];
+  const player = data.players[index];
 
   function nextPlayer() {
     setRevealed(false);
     setIndex((prev) => prev + 1);
   }
 
-  if (!player) {
-    state.data.phase = "discussion";
-    return <OfflineImpostorGame />;
-  }
+    useEffect(() => {
+    if (!player) {
+      onNextPhase("discussion");
+    }
+  }, [onNextPhase, player]);
+  
 
   return (
     <div className="reveal-screen">
@@ -34,7 +43,7 @@ export function RevealPhase(state: any) {
           ) : (
             <h1>{player?.word}</h1>
           )}
-          {state.data.whoStart == player.name && (
+          {data.whoStart == player.name && (
             <>
               <p>Prepare-se, você inicia a partida.</p>
             </>
