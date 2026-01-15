@@ -58,33 +58,41 @@ export function ResultPhase({ data, onNextPhase, onNextRound }: DiscussPhaseProp
             {impostors.length > 1 && (
                 <p>Impostores restantes: <strong>{impostorsLeft}</strong></p>
             )}
-            {gameOver && (
-                <>
-                    <h3>Pontuação da Rodada</h3>
-                    <ul>
-                        {data.players.map(p => (
-                            <li key={p.id}>
-                                {p.name}: {scores[p.name]} ponto{Math.abs(scores[p.name]) === 1 ? '' : 's'}
-                                {p.isImpostor ? ' (Impostor)' : ''}
-                            </li>
-                        ))}
-                    </ul>
-                    <h3>Pontuação Acumulada</h3>
-                    <ul>
-                        {data.players.map(p => {
-                            const roundScore = scores[p.name] ?? 0;
-                            const prevScore = typeof p.score === 'number' ? p.score : 0;
-                            const totalScore = prevScore + roundScore;
-                            return (
+            {gameOver && (() => {
+                // Ordena por pontuação acumulada (score + rodada)
+                const playersSorted = [...data.players].sort((a, b) => {
+                    const aTotal = (typeof a.score === 'number' ? a.score : 0) + (scores[a.name] ?? 0);
+                    const bTotal = (typeof b.score === 'number' ? b.score : 0) + (scores[b.name] ?? 0);
+                    return bTotal - aTotal;
+                });
+                return (
+                    <>
+                        <h3>Pontuação da Rodada</h3>
+                        <ul>
+                            {playersSorted.map(p => (
                                 <li key={p.id}>
-                                    {p.name}: {totalScore} ponto{Math.abs(totalScore) === 1 ? '' : 's'}
+                                    {p.name}: {scores[p.name]} ponto{Math.abs(scores[p.name]) === 1 ? '' : 's'}
                                     {p.isImpostor ? ' (Impostor)' : ''}
                                 </li>
-                            );
-                        })}
-                    </ul>
-                </>
-            )}
+                            ))}
+                        </ul>
+                        <h3>Pontuação Acumulada</h3>
+                        <ul>
+                            {playersSorted.map(p => {
+                                const roundScore = scores[p.name] ?? 0;
+                                const prevScore = typeof p.score === 'number' ? p.score : 0;
+                                const totalScore = prevScore + roundScore;
+                                return (
+                                    <li key={p.id}>
+                                        {p.name}: {totalScore} ponto{Math.abs(totalScore) === 1 ? '' : 's'}
+                                        {p.isImpostor ? ' (Impostor)' : ''}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </>
+                );
+            })()}
             {gameOver ? (
                 <>
                     <button onClick={() => navigate("/games/impostor/lobby")}>Voltar ao Lobby</button>

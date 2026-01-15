@@ -11,11 +11,23 @@ export function getImpostorCount(playersCount: number): number {
 
 // seleciona os impostores do jogo
 
+// impostorHistory: array das duas últimas rodadas, cada elemento é array de ids dos impostores daquela rodada
 export function pickImpostors(
   playerIds: string[],
   impostorCount: number,
+  impostorHistory: string[][] = [],
 ): string[] {
-  const shuffled = [...playerIds].sort(() => Math.random() - 0.5);
+  // Junta os ids das duas últimas rodadas
+  const lastTwo = impostorHistory.slice(-2).flat();
+  // Conta quantas vezes cada id apareceu nas duas últimas rodadas
+  const count: Record<string, number> = {};
+  lastTwo.forEach(id => { count[id] = (count[id] || 0) + 1; });
+  // Filtra ids que foram impostor nas duas últimas rodadas
+  const blocked = Object.entries(count).filter(([_, c]) => c >= 2).map(([id]) => id);
+  // Tenta evitar esses ids
+  const candidates = playerIds.filter(id => !blocked.includes(id));
+  let pool = candidates.length >= impostorCount ? candidates : playerIds;
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, impostorCount);
 }
 
@@ -24,20 +36,20 @@ export function pickImpostors(
 function createImpostorPlayers(
   players: GlobalPlayer[],
   impostorNumber: number,
+  impostorHistory: string[][] = [],
 ): ImpostorPlayer[] {
   const impostorCount = impostorNumber;
-
   const impostorIds = pickImpostors(
     players.map((p) => p.id),
     impostorCount,
+    impostorHistory
   );
-
   return players.map((p) => ({
     ...p,
     isImpostor: impostorIds.includes(p.id),
     isAlive: true,
     word: null,
-    score: 0
+    score: (p as any).score ?? 0
   }));
 }
 
@@ -142,10 +154,12 @@ export function initializeGame(
   selectedCategories: string[],
   whoStartButton: boolean,
   impostorCanStart: boolean,
+  impostorHistory: string[][] = [],
 ): GameData {
   const impostorTrueOrFalse = createImpostorPlayers(
     allPlayers,
     howManyImpostors,
+    impostorHistory
   );
 
   const setWordAndData = distributeWords(

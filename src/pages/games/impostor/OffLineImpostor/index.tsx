@@ -4,7 +4,7 @@ import { DiscussPhase } from "./discussPhase";
 import type { GameRouteState, ImpostorGameState } from "../GameLogistic/types";
 import { VotingPhase } from "./votingPhase/VotingPhase";
 import { EliminationPhase } from "./votingPhase/EliminationPhase";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ResultPhase } from "./resultPhase";
 import { initializeGame } from "../GameLogistic/gameLogistic";
 
@@ -23,6 +23,9 @@ export function OfflineImpostorGame() {
       },
     }));
   }
+
+  // Histórico dos impostores das rodadas anteriores
+  const impostorHistoryRef = useRef<string[][]>([]);
 
   function handleNextRound() {
     // Reutiliza as configurações atuais para reiniciar o jogo
@@ -55,7 +58,7 @@ export function OfflineImpostorGame() {
     });
 
     // initializeGame espera allPlayers (GlobalPlayer[]), mas queremos preservar o score acumulado
-    const allPlayers = players.map(({ id, name, score }) => ({ id, name }));
+    const allPlayers = players.map(({ id, name }) => ({ id, name }));
     const newGame = initializeGame(
       allPlayers,
       howManyImpostors,
@@ -64,6 +67,7 @@ export function OfflineImpostorGame() {
       selectedCategories,
       Boolean(whoStart),
       impostorCanStart,
+      impostorHistoryRef.current
     );
 
     // Junta os scores acumulados
@@ -76,6 +80,10 @@ export function OfflineImpostorGame() {
         score: prevScore + roundScore,
       };
     });
+
+    // Atualiza histórico de impostores
+    const newImpostors = updatedPlayers.filter(p => p.isImpostor).map(p => p.id);
+    impostorHistoryRef.current = [...impostorHistoryRef.current, newImpostors].slice(-2);
 
     setGameState({
       data: {
