@@ -11,6 +11,81 @@ export function getImpostorCount(playersCount: number): number {
 
 // seleciona os impostores do jogo
 
+// const com os icones e cores dos jogadores
+
+const PLAYER_ICONS = [
+  "🤫",
+  "😁",
+  "👾",
+  "👨‍🚀",
+  "👩‍🚀",
+  "👽",
+  "🤖",
+  "😎",
+  "🫥",
+  "🤔",
+  "🤐",
+  "😶‍🌫️",
+  "😶",
+  "🫠",
+  "🥸",
+  "🤥",
+  "🫣",
+  "🧐",
+  "👹",
+  "🫢",
+  "🤓",
+  "😈",
+  "👿",
+  "💀",
+  "👻",
+  "👺",
+  "🧞‍♀️",
+  "🧞‍♂️",
+  "🧟",
+  "🧌",
+  "👨🏻",
+  "👨🏽",
+  "👩🏽",
+  "👩🏻",
+  "🤴🏻",
+  "👸🏻",
+  "🧑🏻‍🎄",
+  "🕵🏻‍♀️",
+  "🦹🏻",
+  "🦸🏻",
+  "🧙🏻",
+  "🧛🏻",
+];
+
+const ICON_COLORS = [
+  "#ff003c",
+  "#3b82f6",
+  "#facc15",
+  "#10b981",
+  "#6d28d9",
+  "#00f2ff",
+  "#ff7b00",
+  "#ff00fb",
+  "#00ff40",
+  "#ffffff",
+  "#7f1d1d",
+  "#075985",
+  "#a16207",
+  "#065f46",
+  "#4c1d95",
+  "#0891b2",
+  "#b91c1c",
+  "#1d4ed8",
+  "#eab308",
+  "#22c55e",
+];
+
+// Função auxiliar para embaralhar arrays
+function shuffleArray<T>(array: T[]): T[] {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
 // impostorHistory: array das duas últimas rodadas, cada elemento é array de ids dos impostores daquela rodada
 export function pickImpostors(
   playerIds: string[],
@@ -21,11 +96,15 @@ export function pickImpostors(
   const lastTwo = impostorHistory.slice(-2).flat();
   // Conta quantas vezes cada id apareceu nas duas últimas rodadas
   const count: Record<string, number> = {};
-  lastTwo.forEach(id => { count[id] = (count[id] || 0) + 1; });
+  lastTwo.forEach((id) => {
+    count[id] = (count[id] || 0) + 1;
+  });
   // Filtra ids que foram impostor nas duas últimas rodadas
-  const blocked = Object.entries(count).filter(([_, c]) => c >= 2).map(([id]) => id);
+  const blocked = Object.entries(count)
+    .filter(([_, c]) => c >= 2)
+    .map(([id]) => id);
   // Tenta evitar esses ids
-  const candidates = playerIds.filter(id => !blocked.includes(id));
+  const candidates = playerIds.filter((id) => !blocked.includes(id));
   let pool = candidates.length >= impostorCount ? candidates : playerIds;
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, impostorCount);
@@ -38,19 +117,35 @@ function createImpostorPlayers(
   impostorNumber: number,
   impostorHistory: string[][] = [],
 ): ImpostorPlayer[] {
-  const impostorCount = impostorNumber;
   const impostorIds = pickImpostors(
     players.map((p) => p.id),
-    impostorCount,
-    impostorHistory
+    impostorNumber,
+    impostorHistory,
   );
-  return players.map((p) => ({
-    ...p,
-    isImpostor: impostorIds.includes(p.id),
-    isAlive: true,
-    word: null,
-    score: (p as any).score ?? 0
-  }));
+
+  const shuffledIcons = shuffleArray(PLAYER_ICONS);
+  const shuffledColors = shuffleArray(ICON_COLORS);
+
+  return players.map((p, index) => {
+    const pAny = p as any;
+
+    // IMPORTANTE: Se pAny.score for 0, o JS trata como 'false'.
+    // Usamos typeof para garantir que o 0 seja preservado.
+    const currentScore = typeof pAny.score === "number" ? pAny.score : 0;
+    const currentGlobal =
+      typeof pAny.globalScore === "number" ? pAny.globalScore : currentScore;
+
+    return {
+      ...p,
+      isImpostor: impostorIds.includes(p.id),
+      isAlive: true,
+      word: null,
+      score: currentScore,
+      globalScore: currentGlobal,
+      emoji: pAny.emoji ?? shuffledIcons[index % shuffledIcons.length],
+      color: pAny.color ?? shuffledColors[index % shuffledColors.length],
+    };
+  });
 }
 
 function selectWhoStart(
@@ -159,7 +254,7 @@ export function initializeGame(
   const impostorTrueOrFalse = createImpostorPlayers(
     allPlayers,
     howManyImpostors,
-    impostorHistory
+    impostorHistory,
   );
 
   const setWordAndData = distributeWords(

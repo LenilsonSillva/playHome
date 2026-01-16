@@ -1,5 +1,7 @@
 import { PlayerContextProvider } from "./contexts/playersProvider";
 import { AppRoutes } from "./routes";
+import "./styles/theme.css";
+import "./styles/global.css";
 
 function App() {
   return (

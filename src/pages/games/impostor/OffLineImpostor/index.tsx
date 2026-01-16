@@ -1,7 +1,11 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RevealPhase } from "./revealPhase";
 import { DiscussPhase } from "./discussPhase";
-import type { GameRouteState, ImpostorGameState } from "../GameLogistic/types";
+import type {
+  GameRouteState,
+  ImpostorGameState,
+  ImpostorPlayer,
+} from "../GameLogistic/types";
 import { VotingPhase } from "./votingPhase/VotingPhase";
 import { EliminationPhase } from "./votingPhase/EliminationPhase";
 import { useState, useRef } from "react";
@@ -10,6 +14,7 @@ import { initializeGame } from "../GameLogistic/gameLogistic";
 
 export function OfflineImpostorGame() {
   const location = useLocation();
+  const navigate = useNavigate();
   const Initialstate = location.state as GameRouteState;
 
   const [gameState, setGameState] = useState<GameRouteState>(Initialstate);
@@ -28,88 +33,111 @@ export function OfflineImpostorGame() {
   const impostorHistoryRef = useRef<string[][]>([]);
 
   function handleNextRound() {
-    // Reutiliza as configurações atuais para reiniciar o jogo
-    const {
-      players,
-      howManyImpostors,
-      twoWordsMode,
-      impostorHint,
-      selectedCategories,
-      whoStart,
-      impostorCanStart,
-    } = gameState.data;
+    setGameState((prevState) => {
+      const {
+        players,
+        howManyImpostors,
+        twoWordsMode,
+        impostorHint,
+        selectedCategories,
+        whoStart,
+        impostorCanStart,
+      } = prevState.data;
 
-    // Calcula os pontos da rodada atual
-    const roundScores: Record<string, number> = {};
-    players.forEach(p => {
-      if (p.isImpostor) {
-        if (p.isAlive) {
-          roundScores[p.id] = 2;
+      // 1. Cálculo da pontuação da rodada que terminou
+      const roundScores: Record<string, number> = {};
+      players.forEach((p) => {
+        if (p.isImpostor) {
+          roundScores[p.id] = p.isAlive ? 2 : -1.5;
         } else {
-          roundScores[p.id] = -1.5;
+          roundScores[p.id] = p.isAlive ? 1 : 0;
         }
-      } else {
-        if (p.isAlive) {
-          roundScores[p.id] = 1;
-        } else {
-          roundScores[p.id] = 0;
-        }
-      }
-    });
+      });
 
-    // initializeGame espera allPlayers (GlobalPlayer[]), mas queremos preservar o score acumulado
-    const allPlayers = players.map(({ id, name }) => ({ id, name }));
-    const newGame = initializeGame(
-      allPlayers,
-      howManyImpostors,
-      twoWordsMode,
-      impostorHint,
-      selectedCategories,
-      Boolean(whoStart),
-      impostorCanStart,
-      impostorHistoryRef.current
-    );
+      // 2. Prepara dados para inicializar a nova rodada
+      const playersForNewGame = players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        score: p.score,
+        globalScore: p.globalScore,
+        emoji: p.emoji,
+        color: p.color,
+      }));
 
-    // Junta os scores acumulados
-    const updatedPlayers = newGame.allPlayers.map(newP => {
-      const oldP = players.find(p => p.id === newP.id);
-      const prevScore = oldP && typeof oldP.score === 'number' ? oldP.score : 0;
-      const roundScore = roundScores[newP.id] ?? 0;
+      const newGame = initializeGame(
+        playersForNewGame as any,
+        howManyImpostors,
+        twoWordsMode,
+        impostorHint,
+        selectedCategories,
+        Boolean(whoStart),
+        impostorCanStart,
+        impostorHistoryRef.current,
+      );
+
+      // 3. Atualização dos jogadores: acumulando score e mantendo globalScore fixo
+      const updatedPlayers: ImpostorPlayer[] = newGame.allPlayers.map(
+        (newP) => {
+          const oldP = players.find((p) => p.id === newP.id);
+          const pointsFromMatchJustFinished = roundScores[newP.id] ?? 0;
+          const previousTotal = oldP?.score ?? 0;
+          const newTotal = previousTotal + pointsFromMatchJustFinished;
+
+          return {
+            ...newP,
+            score: newTotal, // Acumulado real para cálculos futuros
+            globalScore: newTotal, // Atualiza para a discussão da PRÓXIMA palavra
+            emoji: oldP?.emoji ?? newP.emoji,
+            color: oldP?.color ?? newP.color,
+          };
+        },
+      );
+
+      // 4. Retorno do estado formatado exatamente conforme o tipo GameRouteState
       return {
-        ...newP,
-        score: prevScore + roundScore,
+        data: {
+          players: updatedPlayers,
+          howManyImpostors: newGame.howManyImpostors,
+          impostorCanStart: newGame.impostorCanStart,
+          impostorHint: newGame.impostorHasHint, // Mapeamento correto do nome
+          selectedCategories: newGame.selectedCategories,
+          twoWordsMode: newGame.twoWordsMode,
+          whoStart: newGame.whoStart ?? undefined, // Força a existência da chave
+          phase: "reveal" as const,
+        },
       };
     });
+  }
 
-    // Atualiza histórico de impostores
-    const newImpostors = updatedPlayers.filter(p => p.isImpostor).map(p => p.id);
-    impostorHistoryRef.current = [...impostorHistoryRef.current, newImpostors].slice(-2);
-
-    setGameState({
-      data: {
-        players: updatedPlayers,
-        howManyImpostors: newGame.howManyImpostors,
-        twoWordsMode: newGame.twoWordsMode,
-        impostorHint: newGame.impostorHasHint,
-        selectedCategories: newGame.selectedCategories,
-        whoStart: newGame.whoStart,
-        impostorCanStart: newGame.impostorCanStart,
-        phase: "reveal",
-      },
-    });
+  function goBackLobby() {
+    navigate("/games/impostor/lobby");
   }
 
   switch (gameState.data.phase) {
     case "reveal":
-      return <RevealPhase data={gameState.data} onNextPhase={changePhase} />;
+      return (
+        <RevealPhase
+          data={gameState.data}
+          onNextPhase={changePhase}
+          onExit={goBackLobby}
+        />
+      );
     case "discussion":
       return <DiscussPhase data={gameState.data} onNextPhase={changePhase} />;
     case "voting":
       return <VotingPhase data={gameState.data} onNextPhase={changePhase} />;
     case "elimination":
-      return <EliminationPhase data={gameState.data} onNextPhase={changePhase} />;
+      return (
+        <EliminationPhase data={gameState.data} onNextPhase={changePhase} />
+      );
     case "result":
-      return <ResultPhase data={gameState.data} onNextPhase={changePhase} onNextRound={handleNextRound} />;
+      return (
+        <ResultPhase
+          data={gameState.data}
+          onNextPhase={changePhase}
+          onNextRound={handleNextRound}
+        />
+      );
     default:
       return null;
   }

@@ -1,0 +1,180 @@
+/* Lobby container */
+.lobby-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+  padding: 0;
+  padding-bottom: 3rem;
+  width: 90%;
+  justify-self: center;
+  max-width: 1200px;
+}
+
+/* Header styles */
+.title-header {
+  width: 100vw;
+  min-height: 64px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  padding: 0 32px;
+  gap: 24px;
+}
+
+.header-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-default);
+  margin: 0;
+  align-self: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.gameTitle {
+  font-family: "Lilita One", cursive;
+  font-size: 4.5rem; /* Bem grande e impactante */
+  text-align: center;
+  margin: 1rem 0 2rem 0;
+  color: var(--danger-neon);
+  text-transform: uppercase;
+  letter-spacing: 5px;
+
+  /* Efeito de profundidade e brilho */
+  text-shadow:
+    4px 4px 0px #7f1d1d,
+    /* Sombra sólida de profundidade */ 0 0 20px var(--danger-glow); /* Brilho neon ao redor */
+
+  /* Animação sutil de 'tensão' */
+  animation: titleBreathe 3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.shhEmoji {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+@keyframes titleBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+    text-shadow:
+      4px 4px 0px #7f1d1d,
+      0 0 20px var(--danger-glow);
+  }
+  50% {
+    transform: scale(1.05);
+    text-shadow:
+      4px 4px 0px #7f1d1d,
+      0 0 40px var(--danger-neon);
+  }
+}
+
+/* Responsividade para o título não quebrar em celulares */
+@media (max-width: 768px) {
+  .gameTitle {
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+  }
+  .shhEmoji {
+    font-size: 2.5rem;
+  }
+}
+
+.select-btn-container {
+  display: flex;
+  flex-direction: row;
+  width: 95%;
+  max-width: 600px; /* Limita para não ficar gigante no PC */
+  margin: 20px auto;
+  gap: 0; /* Garante que fiquem colados */
+}
+
+/* Estilo Base para os dois botões */
+.select-btn-base {
+  flex: 1;
+  padding: 15px 5px;
+  font-size: 20px; /* Fonte equilibrada */
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.5); /* Texto opaco quando não selecionado */
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  user-select: none;
+  position: relative;
+  background: var(--gray-700); /* Fundo neutro desativado */
+  box-shadow: inset 0 -4px rgba(0, 0, 0, 0.4); /* Sombra interna para parecer "fundo" */
+}
+
+/* Bordas externas arredondadas */
+.btn-left {
+  border-radius: 16px 0 0 16px;
+}
+
+.btn-right {
+  border-radius: 0 16px 16px 0;
+}
+
+/* --- ESTADO ATIVO (O DESTAQUE) --- */
+
+.active {
+  color: #fff;
+  z-index: 2; /* Fica por cima da emenda */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  /* Efeito 3D de botão "para fora" */
+  transform: translateY(-2px);
+}
+
+/* Cores específicas quando ativos */
+.btn-left.active {
+  background: var(--button-impostor);
+  box-shadow:
+    0 6px #8c1f1f,
+    0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-right.active {
+  background: var(--button-impostor);
+  box-shadow:
+    0 6px #8c1f1f,
+    0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* --- HOVER (Apenas nos não ativos para dar feedback) --- */
+.select-btn-base:not(.active):hover {
+  background: var(--gray-600);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+  .lobby-container {
+    width: 95%; /* quase toda a tela no celular */
+    padding-bottom: 2rem;
+  }
+  .select-btn,
+  .select-btn-blue {
+    font-size: 19px;
+    padding: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .lobby-container {
+    width: 100%; /* tela pequena, ocupa tudo */
+    padding-bottom: 1.5rem;
+  }
+  .select-btn,
+  .select-btn-blue {
+    font-size: 16px;
+    padding: 7px 0;
+  }
+}

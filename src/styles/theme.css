@@ -1,55 +1,91 @@
 :root {
-  --gray-100: #e6e9f0;
-  --gray-200: #cdd3e1;
-  --gray-300: #aab3cc;
-  --gray-400: #555f7d;
-  --gray-500: #454f6a;
-  --gray-600: #363d56;
-  --gray-700: #272f43;
-  --gray-800: #181f2e;
-  --gray-900: #0a0f1a;
+  /* --- ESCALA DE CINZAS METÁLICOS (Deep Space) --- */
+  /* Do mais claro ao vácuo absoluto */
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #1e293b; /* Cor de fundos de seção */
+  --gray-800: #0f172a; /* Azul ardósia muito escuro */
+  --gray-900: #020617; /* O Vácuo (Fundo principal) */
 
-  --primary-light: #4de7b7;
-  --primary: #0da170;
-  --primary-dark: #065f46;
+  /* --- CORES DE IDENTIDADE (Tensão e Mistério) --- */
 
-  --link-color: #10b981;
-  --link-hover: #0b8a60;
+  /* Vermelho Impostor (O Perigo) */
+  --danger-neon: #ff003c;
+  --danger-glow: rgba(255, 0, 60, 0.5);
 
-  --success: #22c55e;
-  --warning: #eab308;
-  --error: #991b1b;
-  --info: #0ea5e9;
+  /* Amarelo Âmbar (Avisos e Sabotagem) */
+  --caution-amber: #facc15;
+  --caution-glow: rgba(250, 204, 21, 0.3);
 
-  --text-over-primary: #0a0f1a;
-  --text-over-primary-dark: #e6e9f0;
-  --text-over-primary-light: #0a0f1a;
-  --text-over-success: #0a0f1a;
-  --text-over-warning: #0a0f1a;
-  --text-over-error: #e6e9f0;
-  --text-over-info: #0a0f1a;
+  /* Azul Plasma / Tech (Sistemas da Nave) */
+  --plasma-blue: #3b82f6;
+  --plasma-glow: rgba(59, 130, 246, 0.4);
 
-  --text-default: #e6e9f0;
-  --text-muted: #aab3cc;
+  /* Ciano Tech (Interface e Cometas) */
+  --tech-cyan: #00f2ff;
+  --tech-glow: rgba(0, 242, 255, 0.3);
 
-  --disabled: #555f7d;
-  --text-disabled: #aab3cc;
+  /* --- GRADIENTES PARA BOTÕES 3D --- */
+
+  /* Botão Principal/Impostor */
+  --button-red: linear-gradient(180deg, #ff003c 0%, #7f1d1d 100%);
+
+  /* Botão de Sistema/Online */
+  --button-tech: linear-gradient(180deg, #00f2ff 0%, #0077ff 100%);
+
+  /* Botão de Alerta/Categorias */
+  --button-warning: linear-gradient(180deg, #facc15 0%, #a16207 100%);
+
+  /* Botão Neutro/Sair */
+  --button-system: linear-gradient(180deg, #334155 0%, #0f172a 100%);
+
+  /* --- TIPOGRAFIA --- */
+  --text-default: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-highlight: #00f2ff;
+  --text-error: #ff4d4d;
+
+  /* --- STATUS --- */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
 }
 
-:root[data-theme="light"] {
-  --gray-100: #0a0f1a;
-  --gray-200: #181f2e;
-  --gray-300: #272f43;
-  --gray-400: #363d56;
-  --gray-500: #454f6a;
-  --gray-600: #555f7d;
-  --gray-700: #aab3cc;
-  --gray-800: #cdd3e1;
-  --gray-900: #e6e9f0;
+/* --- CLASSES GLOBAIS DE UTILIDADE --- */
 
-  --text-default: #0a0f1a;
-  --text-muted: #272f43;
+/* Aplicar no container principal de cada página */
+.main-bg {
+  background-color: var(--gray-900);
+  color: var(--text-default);
+  min-height: 100vh;
+  font-family: "Inter", sans-serif; /* Ou sua fonte padrão */
+}
 
-  --link-color: #0b8a60;
-  --link-hover: #065f46;
+/* Efeito de Vidro Industrial para os Cards */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.85); /* var(--gray-800) com transparência */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  border-radius: 20px;
+}
+
+/* Scrollbar Estilizada (Estilo Nave) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--gray-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray-700);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tech-cyan);
 }

@@ -6,7 +6,10 @@ export type ImpostorPlayer = GlobalPlayer & {
   word: string | null;
   vote?: string;
   hint?: string;
-  score: number | null;
+  score: number;
+  emoji: string;
+  color: string;
+  globalScore: number;
 };
 
 export type ImpostorGameState = {

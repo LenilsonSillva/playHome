@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import styles from "./discussPhase.module.css";
 import type {
   GameRouteState,
   ImpostorGameState,
 } from "../../GameLogistic/types";
+import { PlayerAvatar } from "../PlayerAvatar/PlayerAvatar";
+
 type DiscussPhaseProps = {
   data: GameRouteState["data"];
   onNextPhase: (phase: ImpostorGameState["phase"]) => void;
@@ -10,59 +13,88 @@ type DiscussPhaseProps = {
 
 export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
   const [seconds, setSeconds] = useState(0);
-  const [nextPhase, setNextPhase] = useState("");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds((prev) => prev + 1);
-    }, 1000);
-
+    const interval = setInterval(() => setSeconds((p) => p + 1), 1000);
     return () => clearInterval(interval);
   }, []);
 
+  // ORDENAÇÃO: Filtramos os vivos e ordenamos pelo score decrescente
+  const sortedPlayers = [...data.players]
+    .filter((p) => p.isAlive)
+    // Ordena por globalScore (que agora contém o total até a rodada passada)
+    .sort((a, b) => (b.globalScore ?? 0) - (a.globalScore ?? 0));
+
   function formatTime(totalSeconds: number) {
     const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    const secs = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   }
-
-  useEffect(()=>{
-    if (nextPhase === "voting") {
-    onNextPhase(nextPhase);
-  } else if (nextPhase === "elimination") {
-    onNextPhase(nextPhase);
-  }
-  }),[onNextPhase, nextPhase]
 
   return (
-    <div className="discussion-screen">
-      <h1>Discussão</h1>
+    <div className={styles.container}>
+      <div className={styles.glassPanel}>
+        <h1 className={styles.title}>Discussão</h1>
 
-      <p>⏱️ {formatTime(seconds)} de discussão</p>
+        <div className={styles.timerContainer}>
+          <span className={styles.timerLabel}>TEMPO DECORRIDO</span>
+          <div className={styles.clock}>{formatTime(seconds)}</div>
+        </div>
 
-      <p>JOGADORES VIVOS: </p>
-      <ul>
-        {data.players
-          .filter((p) => p.isAlive)
-          .map((p) => (
-            <li key={p.id}>{p.name}</li>
+        <div className={styles.statusBox}>
+          {data.whoStart && (
+            <p className={styles.startInfo}>
+              📡 <strong>{data.whoStart}</strong> captou algo e inicia a rodada.
+            </p>
+          )}
+          <p className={styles.impostorCount}>
+            ⚠️{" "}
+            {data.howManyImpostors === 1
+              ? "1 IMPOSTOR IDENTIFICADO"
+              : `${data.howManyImpostors} IMPOSTORES`}
+          </p>
+        </div>
+
+        <div className={styles.playerGrid}>
+          {sortedPlayers.map((p) => (
+            <div
+              key={p.id}
+              className={styles.playerCard}
+              style={{ "--player-color": p.color } as any}
+            >
+              {/* Passamos hideScan para limpar o visual */}
+              <PlayerAvatar
+                emoji={p.emoji}
+                color={p.color}
+                size={40}
+                hideScan
+              />
+              <div className={styles.playerInfo}>
+                <span className={styles.playerName}>{p.name}</span>
+                {/* Mostra o placar atualizado das rodadas já finalizadas */}
+                <span className={styles.playerScore}>
+                  Pontos: {p.globalScore}
+                </span>
+              </div>
+            </div>
           ))}
-      </ul>
-      <div>
-        {data.whoStart === undefined ? null : (
-          <p>{data.whoStart} começa o jogo.</p>
-        )}
-      </div>
-      <p>
-        {data.howManyImpostors === 1
-          ? "Existe 1 impostor"
-          : "Existem " + data.howManyImpostors + " impostores"}
-        {data.impostorHint ? " com dica." : null}
-      </p>
+        </div>
 
-      <button onClick={() => setNextPhase("voting")}>Ir para votação</button>
-      <button onClick={() => setNextPhase("elimination")}>Pular Votação</button>
+        <div className={styles.buttonGroup}>
+          <button
+            className={`${styles.actionBtn} ${styles.votingBtn}`}
+            onClick={() => onNextPhase("voting")}
+          >
+            VOTAR
+          </button>
+          <button
+            className={`${styles.actionBtn} ${styles.skipBtn}`}
+            onClick={() => onNextPhase("elimination")}
+          >
+            PULAR VOTAÇÃO
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

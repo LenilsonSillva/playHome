@@ -1,4 +1,7 @@
-import type { GameRouteState, ImpostorGameState } from "../../GameLogistic/types";
+import type {
+  GameRouteState,
+  ImpostorGameState,
+} from "../../GameLogistic/types";
 type DiscussPhaseProps = {
   data: GameRouteState["data"];
   onNextPhase: (phase: ImpostorGameState["phase"]) => void;
@@ -12,7 +15,7 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
   // Estado local para votos: array de {votante, voto}
   const [votes, setVotes] = useState<{ voter: string; voted: string }[]>([]);
   // Jogadores vivos
-  const alivePlayers = data.players.filter(p => p.isAlive);
+  const alivePlayers = data.players.filter((p) => p.isAlive);
   // Jogador atual (quem está votando agora)
   const [currentVoterIdx, setCurrentVoterIdx] = useState(0);
   const currentVoter = alivePlayers[currentVoterIdx];
@@ -20,12 +23,12 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
   // Timer de votação (60 segundos)
   const [seconds, setSeconds] = useState(60);
   const [finished, setFinished] = useState(false);
-  
+
   useEffect(() => {
     if (finished) return;
     if (seconds === 0) {
       // Voto nulo se tempo acabar
-      setVotes(prev => [...prev, { voter: currentVoter.id, voted: "NULO" }]);
+      setVotes((prev) => [...prev, { voter: currentVoter.id, voted: "NULO" }]);
       if (currentVoterIdx < alivePlayers.length - 1) {
         setCurrentVoterIdx(currentVoterIdx + 1);
         setSeconds(60);
@@ -39,14 +42,14 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
       return;
     }
     const interval = setInterval(() => {
-      setSeconds(s => s - 1);
+      setSeconds((s) => s - 1);
     }, 1000);
     return () => clearInterval(interval);
   }, [seconds, currentVoterIdx, alivePlayers.length, finished]);
 
   // Função para votar
   function handleVote(votedId: string) {
-    setVotes(prev => [...prev, { voter: currentVoter.id, voted: votedId }]);
+    setVotes((prev) => [...prev, { voter: currentVoter.id, voted: votedId }]);
     if (currentVoterIdx < alivePlayers.length - 1) {
       setCurrentVoterIdx(currentVoterIdx + 1);
       setSeconds(60);
@@ -56,12 +59,12 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
   }
 
   // Feedback visual de voto realizado
-  const hasVoted = votes.some(v => v.voter === currentVoter.id);
+  const hasVoted = votes.some((v) => v.voter === currentVoter.id);
 
   // Contabilizar votos e mostrar resultado
   function getEliminatedPlayer() {
     const voteCount: Record<string, number> = {};
-    votes.forEach(v => {
+    votes.forEach((v) => {
       if (v.voted !== "NULO") {
         voteCount[v.voted] = (voteCount[v.voted] || 0) + 1;
       }
@@ -86,11 +89,11 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
 
   if (finished) {
     const eliminatedId = getEliminatedPlayer();
-    const eliminatedPlayer = alivePlayers.find(p => p.id === eliminatedId);
+    const eliminatedPlayer = alivePlayers.find((p) => p.id === eliminatedId);
 
     // Contar votos por jogador
     const voteCount: Record<string, number> = {};
-    votes.forEach(v => {
+    votes.forEach((v) => {
       if (v.voted !== "NULO") {
         voteCount[v.voted] = (voteCount[v.voted] || 0) + 1;
       }
@@ -98,7 +101,7 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
 
     function handleResult() {
       if (eliminatedId) {
-        const idx = data.players.findIndex(p => p.id === eliminatedId);
+        const idx = data.players.findIndex((p) => p.id === eliminatedId);
         if (idx !== -1) {
           data.players[idx].isAlive = false;
         }
@@ -110,31 +113,35 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
       <div>
         <h2>Resultado da Votação</h2>
         <ul>
-          {alivePlayers.map(p => (
+          {alivePlayers.map((p) => (
             <li key={p.id}>
-              {p.name}: {voteCount[p.id] || 0} voto{(voteCount[p.id] || 0) === 1 ? '' : 's'}
+              {p.name}: {voteCount[p.id] || 0} voto
+              {(voteCount[p.id] || 0) === 1 ? "" : "s"}
             </li>
           ))}
           <li key="nulo">
-            Nulos: {votes.filter(v => v.voted === "NULO").length}
+            Nulos: {votes.filter((v) => v.voted === "NULO").length}
           </li>
         </ul>
         {eliminatedPlayer ? (
-          <p>Eliminado: <strong>{eliminatedPlayer.name}</strong></p>
+          <p>
+            Eliminado: <strong>{eliminatedPlayer.name}</strong>
+          </p>
         ) : (
           <p>Ninguém foi eliminado (empate ou votos nulos).</p>
         )}
-        <button onClick={() => setShowDetails(s => !s)}>
+        <button onClick={() => setShowDetails((s) => !s)}>
           {showDetails ? "Ocultar detalhes" : "Mostrar detalhes"}
         </button>
         {showDetails && (
           <ul>
             {votes.map((v, idx) => {
-              const voter = alivePlayers.find(p => p.id === v.voter);
-              const voted = alivePlayers.find(p => p.id === v.voted);
+              const voter = alivePlayers.find((p) => p.id === v.voter);
+              const voted = alivePlayers.find((p) => p.id === v.voted);
               return (
                 <li key={idx}>
-                  {voter ? voter.name : v.voter} votou em {v.voted === "NULO" ? "NULO" : (voted ? voted.name : v.voted)}
+                  {voter ? voter.name : v.voter} votou em{" "}
+                  {v.voted === "NULO" ? "NULO" : voted ? voted.name : v.voted}
                 </li>
               );
             })}
@@ -148,36 +155,37 @@ export function VotingPhase({ data, onNextPhase }: DiscussPhaseProps) {
   return (
     <div>
       <h2>Votação</h2>
-      <p>Tempo restante: <strong>{seconds}s</strong></p>
-      <p>Jogador votando agora: <strong>{currentVoter.name}</strong></p>
+      <p>
+        Tempo restante: <strong>{seconds}s</strong>
+      </p>
+      <p>
+        Jogador votando agora: <strong>{currentVoter.name}</strong>
+      </p>
       <ul>
         {alivePlayers
-          .filter(p => p.id !== currentVoter.id)
-          .map(p => (
+          .filter((p) => p.id !== currentVoter.id)
+          .map((p) => (
             <li key={p.id}>
               {p.name}
-              <button 
-                onClick={() => handleVote(p.id)}
-                disabled={hasVoted}
-              >Votar</button>
+              <button onClick={() => handleVote(p.id)} disabled={hasVoted}>
+                Votar
+              </button>
             </li>
           ))}
       </ul>
-      <button 
+      <button
         onClick={() => handleVote("NULO")}
         disabled={hasVoted}
         style={{ marginTop: 8 }}
-      >Votar Nulo</button>
+      >
+        Votar Nulo
+      </button>
       {hasVoted && <p>Voto realizado! Aguarde o próximo jogador.</p>}
       <p>Votos já realizados:</p>
       <ul>
-        {[...new Set(votes.map(v => v.voter))].map((voterId, idx) => {
-          const voter = alivePlayers.find(p => p.id === voterId);
-          return (
-            <li key={idx}>
-              {voter ? voter.name : voterId} já votou
-            </li>
-          );
+        {[...new Set(votes.map((v) => v.voter))].map((voterId, idx) => {
+          const voter = alivePlayers.find((p) => p.id === voterId);
+          return <li key={idx}>{voter ? voter.name : voterId} já votou</li>;
         })}
       </ul>
     </div>

@@ -1,0 +1,103 @@
+/* Mobile */
+.main {
+  position: relative;
+  min-height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+.orbit {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.comet {
+  position: absolute;
+  /* Usa a variável --left vinda do React */
+  left: var(--left);
+  top: -250px; /* Começa bem acima da tela */
+  width: 2px;
+  height: 200px;
+  background: linear-gradient(
+    to top,
+    #fff 0%,
+    rgba(0, 242, 255, 0.8) 20%,
+    transparent 100%
+  );
+
+  /* Começa invisível para não ficar "preso" no topo durante o delay */
+  opacity: 0;
+
+  /* Aplica escala e rotação */
+  transform: rotate(var(--angle)) scale(var(--scale));
+
+  /* Configuração da animação */
+  animation-name: cometFall;
+  animation-duration: var(--duration);
+  animation-delay: var(--delay);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* O brilho da ponta (Cabeça do cometa) */
+.comet::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 15px 2px #0ff,
+    0 0 5px #fff;
+}
+
+@keyframes cometFall {
+  0% {
+    /* No início da animação, ele aparece e começa a cair */
+    transform: rotate(var(--angle)) scale(var(--scale)) translateY(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: var(--opacity);
+  }
+  95% {
+    opacity: var(--opacity);
+  }
+  100% {
+    /* Termina bem abaixo da tela */
+    transform: rotate(var(--angle)) scale(var(--scale)) translateY(130vh);
+    opacity: 0;
+  }
+}
+
+/* --- Restante do seu código (Foguete) --- */
+.spaceship {
+  width: 70px;
+  position: absolute;
+  offset-rotate: auto 90deg;
+  animation: fly 15s linear infinite;
+  z-index: 5;
+}
+
+@keyframes fly {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 10;
+}

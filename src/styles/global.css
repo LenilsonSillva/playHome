@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Lilita+One&display=swap");
+
 * {
   margin: 0;
   padding: 0;
@@ -6,6 +8,8 @@
 
 html {
   font-size: 62.5%;
+  width: 100%;
+  overflow: auto;
 }
 
 body {
@@ -24,20 +28,21 @@ body {
   font-size: 1.6rem;
   background: var(--gray-900);
   color: var(--text-default);
+  width: 100%;
+  overflow: auto;
+  body::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* Chrome/Safari/Edge */
+  }
 }
 
-.form {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 2.4rem;
+body::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* Chrome/Safari/Edge */
 }
 
-.formRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 2.4rem;
+@media (max-width: 600px) {
+  h1 {
+    font-size: 20px;
+  }
 }

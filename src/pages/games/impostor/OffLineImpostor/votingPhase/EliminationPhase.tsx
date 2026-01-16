@@ -1,4 +1,7 @@
-import type { GameRouteState, ImpostorGameState } from "../../GameLogistic/types";
+import type {
+  GameRouteState,
+  ImpostorGameState,
+} from "../../GameLogistic/types";
 type DiscussPhaseProps = {
   data: GameRouteState["data"];
   onNextPhase: (phase: ImpostorGameState["phase"]) => void;
@@ -7,7 +10,7 @@ type DiscussPhaseProps = {
 import { useState } from "react";
 
 export function EliminationPhase({ data, onNextPhase }: DiscussPhaseProps) {
-  const alivePlayers = data.players.filter(p => p.isAlive);
+  const alivePlayers = data.players.filter((p) => p.isAlive);
   const [eliminatedId, setEliminatedId] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -18,7 +21,7 @@ export function EliminationPhase({ data, onNextPhase }: DiscussPhaseProps) {
 
   function handleAdvance() {
     if (eliminatedId) {
-      const idx = data.players.findIndex(p => p.id === eliminatedId);
+      const idx = data.players.findIndex((p) => p.id === eliminatedId);
       if (idx !== -1) {
         data.players[idx].isAlive = false;
       }
@@ -27,12 +30,14 @@ export function EliminationPhase({ data, onNextPhase }: DiscussPhaseProps) {
   }
 
   if (confirmed) {
-    const eliminatedPlayer = alivePlayers.find(p => p.id === eliminatedId);
+    const eliminatedPlayer = alivePlayers.find((p) => p.id === eliminatedId);
     return (
       <div>
         <h2>Eliminação Manual</h2>
         {eliminatedPlayer ? (
-          <p>Eliminado: <strong>{eliminatedPlayer.name}</strong></p>
+          <p>
+            Eliminado: <strong>{eliminatedPlayer.name}</strong>
+          </p>
         ) : (
           <p>Ninguém foi eliminado.</p>
         )}
@@ -46,10 +51,13 @@ export function EliminationPhase({ data, onNextPhase }: DiscussPhaseProps) {
       <h2>Eliminação Manual</h2>
       <p>O host deve escolher quem será eliminado nesta rodada:</p>
       <ul>
-        {alivePlayers.map(p => (
+        {alivePlayers.map((p) => (
           <li key={p.id}>
             {p.name}
-            <button onClick={() => handleEliminate(p.id)} style={{ marginLeft: 8 }}>
+            <button
+              onClick={() => handleEliminate(p.id)}
+              style={{ marginLeft: 8 }}
+            >
               Eliminar
             </button>
           </li>
