@@ -219,7 +219,12 @@ export function VotingPhase({ data, onEliminate }: VotingProps) {
       <div className="glass-panel voting-container">
         <div className="voting-header">
           <div className="timer-circle">
-            <span className={seconds <= 10 ? "critical" : ""}>{seconds}s</span>
+            <span
+              key={seconds <= 10 ? "critical" : "normal"}
+              className={seconds <= 10 ? "critical" : ""}
+            >
+              {seconds}s
+            </span>
           </div>
           <div className="voter-info">
             <p className="label">VOTANDO AGORA</p>

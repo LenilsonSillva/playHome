@@ -85,9 +85,38 @@
   align-items: center;
 }
 
-.player-vote-card:hover {
-  border-color: var(--danger-neon);
-  transform: translateY(-2px);
+/* 1. ESTADO PADRÃO DO OVERLAY (Invisível) */
+.vote-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--danger-neon);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  opacity: 0; /* Começa totalmente invisível */
+  transition: opacity 0.2s;
+  pointer-events: none; /* Importante: cliques passam através dele */
+}
+
+/* 2. HOVER APENAS PARA COMPUTADORES (MOUSE) */
+@media (hover: hover) {
+  .player-vote-card:hover {
+    border-color: var(--danger-neon);
+    transform: translateY(-2px);
+  }
+
+  .player-vote-card:hover .vote-hover-overlay {
+    opacity: 0.9; /* Só aparece no mouse */
+  }
+}
+
+/* 3. FEEDBACK VISUAL PARA CELULAR (TOQUE) */
+.player-vote-card:active {
+  background: var(--gray-700);
+  transform: scale(0.95);
+  transition: 0.1s;
 }
 
 .player-emoji {
@@ -98,23 +127,6 @@
 .player-name {
   color: var(--text-default);
   font-weight: 500;
-}
-
-.vote-hover-overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--danger-neon);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  opacity: 0;
-  transition: 0.2s;
-}
-
-.player-vote-card:hover .vote-hover-overlay {
-  opacity: 0.9;
 }
 
 /* BOTOES */
