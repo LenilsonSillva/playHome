@@ -1,0 +1,96 @@
+.orbit {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  /* Garante que o container de fundo não tente recalcular layout */
+  contain: strict;
+}
+
+.comet {
+  position: absolute;
+  left: var(--left);
+  top: -250px;
+  width: 2px;
+  height: 200px;
+  background: linear-gradient(
+    to top,
+    #fff 0%,
+    rgba(0, 242, 255, 0.8) 20%,
+    transparent 100%
+  );
+  opacity: 0;
+  transform: rotate(var(--angle)) scale(var(--scale));
+
+  /* --- OTIMIZAÇÃO PARA MOBILE --- */
+  will-change: transform, opacity;
+
+  animation-name: cometFall;
+  animation-duration: var(--duration);
+  animation-delay: var(--delay);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.comet::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 15px 2px #0ff,
+    0 0 5px #fff;
+}
+
+@keyframes cometFall {
+  0% {
+    transform: rotate(var(--angle)) scale(var(--scale)) translateY(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: var(--opacity);
+  }
+  95% {
+    opacity: var(--opacity);
+  }
+  100% {
+    /* Usar translate3d força o uso da GPU no celular */
+    transform: rotate(var(--angle)) scale(var(--scale)) translate3d(0, 130vh, 0);
+    opacity: 0;
+  }
+}
+
+/* --- FOGUETE ATUALIZADO --- */
+.spaceship {
+  width: 60px; /* Reduzi um pouco para ficar mais elegante no mobile */
+  position: absolute;
+  offset-rotate: auto 90deg;
+  z-index: 5;
+
+  /* --- OTIMIZAÇÃO CRÍTICA --- */
+  /* O offset-path é pesado. will-change prepara o navegador */
+  will-change: offset-distance, transform;
+
+  /* Adicionei backface-visibility para evitar flicker (piscadas) no Android/iOS */
+  backface-visibility: hidden;
+
+  animation: fly 20s linear infinite; /* 20s deixa o movimento mais fluido e menos 'nervoso' */
+}
+
+@keyframes fly {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}

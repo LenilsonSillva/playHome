@@ -14,7 +14,11 @@
   transform: translate(-50%, -50%);
   width: 80vw;
   height: 80vw;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.1) 0%,
+    transparent 70%
+  );
   filter: blur(100px);
   z-index: 0;
 }
@@ -66,14 +70,34 @@
   opacity: 0;
 }
 
-.wave:nth-child(1) { width: 40px; height: 40px; animation-delay: 0s; }
-.wave:nth-child(2) { width: 60px; height: 60px; animation-delay: 0.5s; }
-.wave:nth-child(3) { width: 80px; height: 80px; animation-delay: 1s; }
+.wave:nth-child(1) {
+  width: 40px;
+  height: 40px;
+  animation-delay: 0s;
+}
+.wave:nth-child(2) {
+  width: 60px;
+  height: 60px;
+  animation-delay: 0.5s;
+}
+.wave:nth-child(3) {
+  width: 80px;
+  height: 80px;
+  animation-delay: 1s;
+}
 
 @keyframes ripple {
-  0% { transform: scale(0.5); opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 .badge {
@@ -116,8 +140,12 @@
 }
 
 @keyframes blink {
-  from { opacity: 0.3; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .statusText {
@@ -187,6 +215,10 @@
 }
 
 @media (max-width: 480px) {
-  .statusCard { padding: 2rem 1.5rem; }
-  .title { font-size: 2rem; }
+  .statusCard {
+    padding: 2rem 1.5rem;
+  }
+  .title {
+    font-size: 2rem;
+  }
 }

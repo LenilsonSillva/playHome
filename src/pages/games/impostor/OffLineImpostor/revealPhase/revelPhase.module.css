@@ -168,6 +168,7 @@
 .revealBtn {
   background: var(--button-tech);
   box-shadow: 0 4px 0 #075985;
+  color: var(--text-default);
 }
 
 .nextBtn {

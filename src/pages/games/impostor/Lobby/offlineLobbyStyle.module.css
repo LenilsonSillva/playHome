@@ -3,7 +3,7 @@
   max-width: 900px;
   margin: 2rem auto;
   padding: 2.5rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.83);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border: 1px solid rgba(0, 242, 255, 0.2);
@@ -79,27 +79,27 @@
   outline: none;
   padding: 0;
   margin: 0;
-  
+
   /* Dimensões e Forma */
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  
+
   /* Cores (Baseadas no seu Danger Neon) */
   background: rgba(255, 0, 60, 0.1);
   border: 1px solid rgba(255, 0, 60, 0.3);
   color: var(--danger-neon);
-  
+
   /* Centralização PERFEITA do X */
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   /* Tipografia */
   font-size: 18px; /* Ajuste conforme o gosto */
   font-weight: bold;
   line-height: 0; /* Truque para não empurrar o texto para baixo */
-  
+
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0; /* Impede que o botão seja esmagado se o nome for longo */
@@ -250,7 +250,7 @@
   right: 0;
   bottom: 0;
   background-color: var(--gray-700);
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 34px;
   border: 1px solid var(--gray-500);
 }
@@ -263,7 +263,7 @@
   left: 4px;
   bottom: 3px;
   background-color: white;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 50%;
 }
 
@@ -359,20 +359,38 @@
   .lobbyWrapper {
     padding: 1.5rem;
     width: 98%;
+    backdrop-filter: none !important; /* Remove o blur que trava o teclado */
+    -webkit-backdrop-filter: none !important;
   }
 
-  .title { font-size: 1.8rem; }
-  
-  .inputGroup { flex-direction: column; }
-  
-  .addButton { padding: 15px; }
+  .title {
+    font-size: 1.8rem;
+  }
 
-  .gridSettings { grid-template-columns: 1fr; }
+  .inputGroup {
+    flex-direction: column;
+  }
 
-  .checkText { font-size: 1.1rem; }
+  .addButton {
+    padding: 15px;
+  }
+
+  .gridSettings {
+    grid-template-columns: 1fr;
+  }
+
+  .checkText {
+    font-size: 1.1rem;
+  }
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

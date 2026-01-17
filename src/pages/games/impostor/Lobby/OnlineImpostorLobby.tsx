@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import styles from "./OnlineLobby.module.css"
+import styles from "./OnlineLobby.module.css";
 
 export function OnlineImpostorLobby() {
   const navigate = useNavigate();
@@ -22,15 +22,18 @@ export function OnlineImpostorLobby() {
           </div>
 
           <div className={styles.content}>
-            <h1 className={styles.title}>MODO <span>ONLINE</span></h1>
+            <h1 className={styles.title}>
+              MODO <span>ONLINE</span>
+            </h1>
             <div className={styles.statusLine}>
               <span className={styles.dot} />
               <p className={styles.statusText}>STATUS: EM DESENVOLVIMENTO</p>
             </div>
-            
+
             <p className={styles.description}>
-              Os protocolos de conexão intergaláctica estão sendo calibrados. 
-              Em breve você poderá enfrentar impostores de outras galáxias em tempo real.
+              Os protocolos de conexão intergaláctica estão sendo calibrados. Em
+              breve você poderá enfrentar impostores de outras galáxias em tempo
+              real.
             </p>
           </div>
 
@@ -38,13 +41,12 @@ export function OnlineImpostorLobby() {
             <div className={styles.progressBar}>
               <div className={styles.progressFill} />
             </div>
-            <span className={styles.percentage}>CALIBRANDO SINCRONIA... 65%</span>
+            <span className={styles.percentage}>
+              CALIBRANDO SINCRONIA... 65%
+            </span>
           </div>
 
-          <button 
-            className={styles.backButton} 
-            onClick={() => navigate("/")}
-          >
+          <button className={styles.backButton} onClick={() => navigate("/")}>
             RETORNAR AO COMANDO CENTRAL
           </button>
         </div>

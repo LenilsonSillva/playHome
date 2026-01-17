@@ -25,7 +25,7 @@ export function ImpostorHeader({ mode, currentMode }: ChildProps) {
         <h1 className={styles.gameTitle}>
           IMPOSTOR <span className={styles.shhEmoji}>🤫</span>
         </h1>
-        
+
         <p className={styles.instruction}>SELECIONE O PROTOCOLO DE CONEXÃO</p>
 
         <div className={styles.modeSelector}>
@@ -36,7 +36,7 @@ export function ImpostorHeader({ mode, currentMode }: ChildProps) {
             <span className={styles.btnIcon}>🏠</span>
             <span className={styles.btnText}>Jogo Local</span>
           </button>
-          
+
           <button
             className={`${styles.modeBtn} ${currentMode === "online" ? styles.active : ""}`}
             onClick={() => mode("online")}
@@ -44,9 +44,11 @@ export function ImpostorHeader({ mode, currentMode }: ChildProps) {
             <span className={styles.btnIcon}>🌏</span>
             <span className={styles.btnText}>Jogo Online</span>
           </button>
-          
+
           {/* Slider de fundo para o efeito de seleção */}
-          <div className={`${styles.slider} ${currentMode === "online" ? styles.slideRight : ""}`} />
+          <div
+            className={`${styles.slider} ${currentMode === "online" ? styles.slideRight : ""}`}
+          />
         </div>
       </div>
     </div>

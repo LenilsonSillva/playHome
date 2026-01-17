@@ -28,10 +28,24 @@ export function PlayerContextProvider({
       return;
     }
 
-    setPlayers((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), name: name.trim() },
-    ]);
+    // GERADOR DE ID ROBUSTO (Funciona em todos os celulares)
+    const generateId = () => {
+      return (
+        Math.random().toString(36).substring(2, 9) +
+        new Date().getTime().toString(36)
+      );
+    };
+
+    try {
+      const newPlayer = {
+        id: generateId(),
+        name: name.trim(),
+      };
+
+      setPlayers((prev) => [...prev, newPlayer]);
+    } catch (error) {
+      console.error("Erro ao adicionar jogador:", error);
+    }
   }
 
   function removePlayer(id: string) {

@@ -8,24 +8,26 @@ export default function Home() {
     {
       id: "impostor",
       name: "Impostor",
-      description: "Um traidor tenta sabotá-lo! Os tripulantes recebem uma palavra, menos o impostor. Ejete-o da nave.",
+      description:
+        "Um traidor tenta sabotá-lo! Os tripulantes recebem uma palavra, menos o impostor. Ejete-o da nave.",
       minPlayers: 3,
       maxPlayers: 20,
       route: "/games/impostor/lobby",
       icon: "🤫",
       accent: "var(--danger-neon)",
-      btn: "var(--button-red)"
+      btn: "var(--button-red)",
     },
     {
       id: "secret-word",
       name: "Palavra Secreta",
-      description: "Comunicação tática! Dê dicas precisas para sua equipe descriptografar a palavra.",
+      description:
+        "Comunicação tática! Dê dicas precisas para sua equipe descriptografar a palavra.",
       minPlayers: 4,
       maxPlayers: 12,
       route: "/games/secret-word/lobby",
       icon: "🔑",
       accent: "var(--tech-cyan)",
-      btn: "var(--button-tech)"
+      btn: "var(--button-tech)",
     },
   ];
 
@@ -35,7 +37,7 @@ export default function Home() {
         {/* Luzes de fundo dinâmicas */}
         <div className={styles.ambientLight1} />
         <div className={styles.ambientLight2} />
-        
+
         <main className={styles.homeContainer}>
           <header className={styles.hero}>
             <div className={styles.badge}>SISTEMA DE JOGOS ATIVO</div>

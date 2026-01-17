@@ -9,7 +9,8 @@
 }
 
 /* --- LUZES DE AMBIENTE --- */
-.ambientLight1, .ambientLight2 {
+.ambientLight1,
+.ambientLight2 {
   position: absolute;
   width: 50vw;
   height: 50vw;
@@ -173,7 +174,11 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, var(--accent) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    var(--accent) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
@@ -185,7 +190,13 @@
 }
 
 @media (max-width: 768px) {
-  .hero { margin-bottom: 40px; }
-  .mainTitle { font-size: 3.5rem; }
-  .gamesGrid { grid-template-columns: 1fr; }
+  .hero {
+    margin-bottom: 40px;
+  }
+  .mainTitle {
+    font-size: 3.5rem;
+  }
+  .gamesGrid {
+    grid-template-columns: 1fr;
+  }
 }

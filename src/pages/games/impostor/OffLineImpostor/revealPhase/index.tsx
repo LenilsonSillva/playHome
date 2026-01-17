@@ -30,11 +30,7 @@ export function RevealPhase({
 
   const handleRerollAction = () => {
     // Apenas reinicia se o usuário confirmar
-    if (
-      window.confirm(
-        "Trocar palavra e sortear novos impostores? (Pontuação será mantida)",
-      )
-    ) {
+    if (window.confirm("Trocar palavra e sortear novos impostores?")) {
       onReroll();
       setIndex(0); // Volta para o primeiro jogador
       setRevealed(false);

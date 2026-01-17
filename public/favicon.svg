@@ -1,0 +1,10 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo Hexagonal -->
+  <path d="M256 30L460.385 148V364L256 482L51.6154 364V148L256 30Z" fill="#020617" stroke="#00f2ff" stroke-width="20"/>
+  
+  <!-- Ícone da Casa/Seta (Play) -->
+  <path d="M256 150L360 250V360H300V290H212V360H152V250L256 150Z" fill="#00f2ff" />
+  
+  <!-- Detalhe de Brilho -->
+  <circle cx="256" cy="256" r="180" stroke="#00f2ff" stroke-width="5" stroke-dasharray="20 40" opacity="0.4" />
+</svg>

@@ -13,7 +13,11 @@
   top: -200px;
   width: 600px;
   height: 400px;
-  background: radial-gradient(circle, rgba(255, 0, 60, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 0, 60, 0.1) 0%,
+    transparent 70%
+  );
   filter: blur(100px);
   z-index: 0;
   pointer-events: none;
@@ -152,9 +156,19 @@
 
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 480px) {
-  .mainTitle { font-size: 2.2rem; }
-  .gameTitle { font-size: 3rem; }
-  .btnText { font-size: 1rem; }
-  .btnIcon { font-size: 1rem; }
-  .modeBtn { padding: 12px 10px; }
+  .mainTitle {
+    font-size: 2.2rem;
+  }
+  .gameTitle {
+    font-size: 3rem;
+  }
+  .btnText {
+    font-size: 1rem;
+  }
+  .btnIcon {
+    font-size: 1rem;
+  }
+  .modeBtn {
+    padding: 12px 10px;
+  }
 }
