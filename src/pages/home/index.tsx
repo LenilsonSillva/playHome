@@ -4,29 +4,56 @@ import type { Game } from "../../types/game";
 import styles from "./styles.module.css";
 
 export default function Home() {
-  const games: Game[] = [
+  const games: (Game & { icon: string; accent: string; btn: string })[] = [
     {
       id: "impostor",
       name: "Impostor",
-      description: "Descubra quem é o impostor antes que seja tarde.",
+      description: "Um traidor tenta sabotá-lo! Os tripulantes recebem uma palavra, menos o impostor. Ejete-o da nave.",
       minPlayers: 3,
       maxPlayers: 20,
       route: "/games/impostor/lobby",
+      icon: "🤫",
+      accent: "var(--danger-neon)",
+      btn: "var(--button-red)"
+    },
+    {
+      id: "secret-word",
+      name: "Palavra Secreta",
+      description: "Comunicação tática! Dê dicas precisas para sua equipe descriptografar a palavra.",
+      minPlayers: 4,
+      maxPlayers: 12,
+      route: "/games/secret-word/lobby",
+      icon: "🔑",
+      accent: "var(--tech-cyan)",
+      btn: "var(--button-tech)"
     },
   ];
 
   return (
     <PlayerContextProvider>
-      <main className={styles.homeContainer}>
-        <h1>🎮 Party Games</h1>
-        <p>Escolha um jogo para começar</p>
+      <div className={styles.pageWrapper}>
+        {/* Luzes de fundo dinâmicas */}
+        <div className={styles.ambientLight1} />
+        <div className={styles.ambientLight2} />
+        
+        <main className={styles.homeContainer}>
+          <header className={styles.hero}>
+            <div className={styles.badge}>SISTEMA DE JOGOS ATIVO</div>
+            <h1 className={styles.mainTitle}>
+              PLAY<span>HOME</span>
+            </h1>
+            <p className={styles.subtitle}>
+              Selecione um protocolo e inicie a diversão com seus amigos.
+            </p>
+          </header>
 
-        <div className={styles.gamesGrid}>
-          {games.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
-        </div>
-      </main>
+          <div className={styles.gamesGrid}>
+            {games.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
+        </main>
+      </div>
     </PlayerContextProvider>
   );
 }

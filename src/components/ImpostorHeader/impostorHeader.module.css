@@ -1,180 +1,160 @@
-/* Lobby container */
-.lobby-container {
+.wrapper {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1.6rem;
-  padding: 0;
-  padding-bottom: 3rem;
-  width: 90%;
-  justify-self: center;
-  max-width: 1200px;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 2rem;
 }
 
-/* Header styles */
-.title-header {
-  width: 100vw;
-  min-height: 64px;
+.ambientLight {
+  position: absolute;
+  top: -200px;
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 0, 60, 0.1) 0%, transparent 70%);
+  filter: blur(100px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* --- LOGO PLAYHOME --- */
+.topHeader {
+  width: 100%;
+  padding: 2rem 0;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-  padding: 0 32px;
-  gap: 24px;
+  gap: 10px;
+  z-index: 1;
 }
 
-.header-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-default);
-  margin: 0;
-  align-self: center;
-  justify-content: center;
+.logoLink {
   text-decoration: none;
 }
 
-.gameTitle {
-  font-family: "Lilita One", cursive;
-  font-size: 4.5rem; /* Bem grande e impactante */
+.mainTitle {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: -2px;
+  color: var(--text-default);
+  line-height: 1;
+}
+
+.mainTitle span {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--gray-400);
+}
+
+.systemBadge {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  color: var(--tech-cyan);
+  opacity: 0.8;
+}
+
+/* --- TÍTULO DO JOGO --- */
+.gameSection {
+  z-index: 1;
+  width: 90%;
+  max-width: 600px;
   text-align: center;
-  margin: 1rem 0 2rem 0;
+}
+
+.gameTitle {
+  font-size: clamp(4rem, 10vw, 3.5rem);
+  font-weight: 900;
   color: var(--danger-neon);
   text-transform: uppercase;
-  letter-spacing: 5px;
-
-  /* Efeito de profundidade e brilho */
-  text-shadow:
-    4px 4px 0px #7f1d1d,
-    /* Sombra sólida de profundidade */ 0 0 20px var(--danger-glow); /* Brilho neon ao redor */
-
-  /* Animação sutil de 'tensão' */
-  animation: titleBreathe 3s ease-in-out infinite;
+  letter-spacing: 4px;
+  margin: 1rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 15px;
+  text-shadow: 0 0 20px var(--danger-glow);
 }
 
 .shhEmoji {
-  font-size: 4rem;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+  font-size: 0.8em;
 }
 
-@keyframes titleBreathe {
-  0%,
-  100% {
-    transform: scale(1);
-    text-shadow:
-      4px 4px 0px #7f1d1d,
-      0 0 20px var(--danger-glow);
-  }
-  50% {
-    transform: scale(1.05);
-    text-shadow:
-      4px 4px 0px #7f1d1d,
-      0 0 40px var(--danger-neon);
-  }
+.instruction {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-bottom: 2rem;
 }
 
-/* Responsividade para o título não quebrar em celulares */
-@media (max-width: 768px) {
-  .gameTitle {
-    font-size: 2.8rem;
-    letter-spacing: 2px;
-  }
-  .shhEmoji {
-    font-size: 2.5rem;
-  }
-}
-
-.select-btn-container {
-  display: flex;
-  flex-direction: row;
-  width: 95%;
-  max-width: 600px; /* Limita para não ficar gigante no PC */
-  margin: 20px auto;
-  gap: 0; /* Garante que fiquem colados */
-}
-
-/* Estilo Base para os dois botões */
-.select-btn-base {
-  flex: 1;
-  padding: 15px 5px;
-  font-size: 20px; /* Fonte equilibrada */
-  font-weight: bold;
-  color: rgba(255, 255, 255, 0.5); /* Texto opaco quando não selecionado */
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-  user-select: none;
+/* --- SELETOR DE MODO (SEGMENTED CONTROL) --- */
+.modeSelector {
   position: relative;
-  background: var(--gray-700); /* Fundo neutro desativado */
-  box-shadow: inset 0 -4px rgba(0, 0, 0, 0.4); /* Sombra interna para parecer "fundo" */
+  display: flex;
+  background: var(--gray-800);
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-700);
+  gap: 5px;
 }
 
-/* Bordas externas arredondadas */
-.btn-left {
-  border-radius: 16px 0 0 16px;
+.modeBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.3s ease;
+  white-space: nowrap;
 }
 
-.btn-right {
-  border-radius: 0 16px 16px 0;
-}
-
-/* --- ESTADO ATIVO (O DESTAQUE) --- */
-
-.active {
+.modeBtn.active {
   color: #fff;
-  z-index: 2; /* Fica por cima da emenda */
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  /* Efeito 3D de botão "para fora" */
-  transform: translateY(-2px);
 }
 
-/* Cores específicas quando ativos */
-.btn-left.active {
-  background: var(--button-impostor);
-  box-shadow:
-    0 6px #8c1f1f,
-    0 10px 15px rgba(0, 0, 0, 0.3);
+.btnText {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.btn-right.active {
-  background: var(--button-impostor);
-  box-shadow:
-    0 6px #8c1f1f,
-    0 10px 15px rgba(0, 0, 0, 0.3);
+.btnIcon {
+  font-size: 1.5rem;
 }
 
-/* --- HOVER (Apenas nos não ativos para dar feedback) --- */
-.select-btn-base:not(.active):hover {
-  background: var(--gray-600);
-  color: rgba(255, 255, 255, 0.8);
+/* O fundo que desliza */
+.slider {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: calc(50% - 8px);
+  height: calc(100% - 12px);
+  background: var(--button-red); /* Gradiente do tema */
+  border-radius: 8px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  box-shadow: 0 4px 15px rgba(255, 0, 60, 0.3);
 }
 
-@media (max-width: 768px) {
-  .lobby-container {
-    width: 95%; /* quase toda a tela no celular */
-    padding-bottom: 2rem;
-  }
-  .select-btn,
-  .select-btn-blue {
-    font-size: 19px;
-    padding: 10px 0;
-  }
+.slideRight {
+  transform: translateX(100%) translateX(5px);
+  background: var(--button-tech); /* Muda para azul se for online */
+  box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
 }
 
+/* --- RESPONSIVIDADE --- */
 @media (max-width: 480px) {
-  .lobby-container {
-    width: 100%; /* tela pequena, ocupa tudo */
-    padding-bottom: 1.5rem;
-  }
-  .select-btn,
-  .select-btn-blue {
-    font-size: 16px;
-    padding: 7px 0;
-  }
+  .mainTitle { font-size: 2.2rem; }
+  .gameTitle { font-size: 3rem; }
+  .btnText { font-size: 1rem; }
+  .btnIcon { font-size: 1rem; }
+  .modeBtn { padding: 12px 10px; }
 }

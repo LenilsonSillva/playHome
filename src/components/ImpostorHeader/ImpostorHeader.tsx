@@ -1,5 +1,6 @@
 import styles from "./impostorHeader.module.css";
 import "../../styles/theme.css";
+
 type ChildProps = {
   mode: (value: string) => void;
   currentMode: string | null;
@@ -7,29 +8,45 @@ type ChildProps = {
 
 export function ImpostorHeader({ mode, currentMode }: ChildProps) {
   return (
-    <div className={styles["lobby-container"]}>
-      <div className={styles["title-header"]}>
-        <a className={styles["header-title"]} href="/">
-          PlayHome
+    <div className={styles.wrapper}>
+      {/* Luz ambiente de fundo (opcional, para combinar com a home) */}
+      <div className={styles.ambientLight} />
+
+      <header className={styles.topHeader}>
+        <a className={styles.logoLink} href="/">
+          <h1 className={styles.mainTitle}>
+            PLAY<span>HOME</span>
+          </h1>
         </a>
-      </div>
-      <div className={styles["lobby-container"]}>
+        <div className={styles.systemBadge}>SISTEMA DE JOGOS</div>
+      </header>
+
+      <div className={styles.gameSection}>
         <h1 className={styles.gameTitle}>
           IMPOSTOR <span className={styles.shhEmoji}>🤫</span>
         </h1>
-        <div className={styles["select-btn-container"]}>
+        
+        <p className={styles.instruction}>SELECIONE O PROTOCOLO DE CONEXÃO</p>
+
+        <div className={styles.modeSelector}>
           <button
-            className={`${styles["select-btn-base"]} ${styles["btn-left"]} ${currentMode === "local" ? styles.active : ""}`}
+            className={`${styles.modeBtn} ${currentMode === "local" ? styles.active : ""}`}
             onClick={() => mode("local")}
           >
-            Jogo Local 🏠
+            <span className={styles.btnIcon}>🏠</span>
+            <span className={styles.btnText}>Jogo Local</span>
           </button>
+          
           <button
-            className={`${styles["select-btn-base"]} ${styles["btn-right"]} ${currentMode === "online" ? styles.active : ""}`}
+            className={`${styles.modeBtn} ${currentMode === "online" ? styles.active : ""}`}
             onClick={() => mode("online")}
           >
-            Jogo Online 🌏
+            <span className={styles.btnIcon}>🌏</span>
+            <span className={styles.btnText}>Jogo Online</span>
           </button>
+          
+          {/* Slider de fundo para o efeito de seleção */}
+          <div className={`${styles.slider} ${currentMode === "online" ? styles.slideRight : ""}`} />
         </div>
       </div>
     </div>

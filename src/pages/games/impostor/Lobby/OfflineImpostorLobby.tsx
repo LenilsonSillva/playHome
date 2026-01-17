@@ -107,189 +107,126 @@ export function OfflineImpostorLobby() {
 
   return (
     <div className={styles.lobbyWrapper}>
-      <h1 className={styles.title}>OPÇÕES DE JOGO</h1>
+  <div className={styles.headerArea}>
+    <h1 className={styles.title}>OPÇÕES DE PROTOCOLO</h1>
+    <p className={styles.subtitle}>Configure os parâmetros da missão</p>
+  </div>
 
-      <div className={styles.section}>
-        <label style={{ fontSize: "1.7rem" }}>
-          Adicione os jogadores (Mínimo 3):
-        </label>
-        <div className={styles.inputGroup}>
-          <input
-            type="text"
-            placeholder="Nome do Jogador"
-            value={name}
-            maxLength={15}
-            onChange={(e) => setName(e.target.value)}
-          />
+  {/* SEÇÃO DE JOGADORES */}
+  <div className={styles.section}>
+    <h2 className={styles.sectionTitle}>EQUIPE DE EXPLORAÇÃO</h2>
+    <div className={styles.inputGroup}>
+      <input
+        type="text"
+        placeholder="Identificação do Tripulante"
+        className={styles.textInput}
+        value={name}
+        maxLength={15}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <button onClick={handleAddNamePlayer} className={styles.addButton}>
+        ADICIONAR
+      </button>
+    </div>
+
+    <div className={styles.playersList}>
+      {players.map((player) => (
+        <div key={player.id} className={styles.playerTag}>
+          <span className={styles.dotIndicator} />
+          <span className={styles.pName}>{player.name}</span>
           <button
-            onClick={handleAddNamePlayer}
-            className={styles.optButton}
-            style={{ padding: "10px 20px", fontSize: "1.5rem" }}
+            className={styles.removeBtn}
+            onClick={() => removePlayer(player.id)}
+            aria-label="Remover jogador"
           >
-            Adicionar
+            ×
           </button>
         </div>
+      ))}
+    </div>
+  </div>
 
-        <div className={styles.playersList}>
-          {players.map((player) => (
-            <div key={player.id} className={styles.playerTag}>
-              <span>{player.name}</span>
-              <button
-                className={styles.removeBtn}
-                onClick={() => removePlayer(player.id)}
-                title="Remover tripulante"
-              >
-                ✕
-              </button>
-            </div>
+  {/* SEÇÃO DE IMPOSTORES */}
+  <div className={styles.section}>
+    <div className={styles.counterRow}>
+      <h2 className={styles.sectionTitle}>QUANTIDADE DE IMPOSTORES</h2>
+      <div className={styles.counterControls}>
+        <button
+          className={styles.countBtn}
+          onClick={() => setSelectImpostorNumbers((p) => Math.max(p - 1, 1))}
+        >
+          -
+        </button>
+        <span className={styles.countDisplay}>{selectImpostorNumbers}</span>
+        <button
+          className={styles.countBtn}
+          onClick={() => setSelectImpostorNumbers((p) => Math.min(p + 1, maxImpostors))}
+        >
+          +
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* CONFIGURAÇÕES GERAIS EM GRADE */}
+  <div className={styles.gridSettings}>
+    {[
+      { label: "Duas palavras", state: twoGroups, fn: handleTwoGroupsChange },
+      { label: "Jogador aleatório inicia", state: whoStart, fn: handleWhoStart },
+      { label: "Impostor pode iniciar", state: impostorCanStart, fn: handleImpostorCanStart },
+      { label: "Impostor tem dica", state: impostorHint, fn: handleImpostorHintChange },
+    ].map((item, i) => (
+      <label key={i} className={styles.checkboxLabel}>
+        <span className={styles.checkText}>{item.label}</span>
+        <div className={styles.switchWrapper}>
+          <input
+            type="checkbox"
+            className={styles.checkboxInput}
+            checked={item.state}
+            onChange={item.fn}
+          />
+          <span className={styles.switchSlider}></span>
+        </div>
+      </label>
+    ))}
+  </div>
+
+  {/* CATEGORIAS */}
+  <div className={styles.categorySection}>
+    <button
+      type="button"
+      className={`${styles.categoryToggle} ${showCategories ? styles.active : ""}`}
+      onClick={() => setShowCategories(!showCategories)}
+    >
+      {showCategories ? "OCULTAR CATEGORIAS" : "SELECIONAR CATEGORIAS"}
+    </button>
+
+    {showCategories && (
+      <div className={styles.categoryContainer}>
+        <div className={styles.categoryGrid}>
+          {categories.map((cat, index) => (
+            <label key={index} className={styles.categoryItem}>
+              <input
+                type="checkbox"
+                className={styles.checkboxInput}
+                checked={categorie.includes(cat)}
+                onChange={() => handleCategorie(cat)}
+              />
+              <span className={styles.categoryBox}>{cat}</span>
+            </label>
           ))}
         </div>
       </div>
+    )}
+  </div>
 
-      <div className={styles.section}>
-        <label style={{ fontSize: "1.7rem" }}>Quantidade de impostor:</label>
-        <div
-          className={styles.inputGroup}
-          style={{ justifyContent: "center", alignItems: "center" }}
-        >
-          <button
-            className={styles.optButton}
-            style={{ padding: "5px 15px" }}
-            onClick={() => setSelectImpostorNumbers((p) => Math.max(p - 1, 1))}
-          >
-            -
-          </button>
-          <span
-            style={{
-              fontSize: "1.7rem",
-              minWidth: "40px",
-              textAlign: "center",
-            }}
-          >
-            {selectImpostorNumbers}
-          </span>
-          <button
-            className={styles.optButton}
-            style={{ padding: "5px 15px" }}
-            onClick={() =>
-              setSelectImpostorNumbers((p) => Math.min(p + 1, maxImpostors))
-            }
-          >
-            +
-          </button>
-        </div>
-      </div>
-
-      <div className={`${styles.section} ${styles.gridSettings}`}>
-        <label className={styles.checkboxLabel}>
-          <span>Duas palavras</span>
-          <div style={{ position: "relative" }}>
-            <input
-              type="checkbox"
-              className={styles.checkboxInput}
-              checked={twoGroups}
-              onChange={handleTwoGroupsChange}
-            />
-            <span className={styles.switch}></span>
-          </div>
-        </label>
-
-        <label className={styles.checkboxLabel}>
-          <span>Jogador aleatório inicia</span>
-          <div style={{ position: "relative" }}>
-            <input
-              type="checkbox"
-              className={styles.checkboxInput}
-              checked={whoStart}
-              onChange={handleWhoStart}
-            />
-            <span className={styles.switch}></span>
-          </div>
-        </label>
-
-        <label className={styles.checkboxLabel}>
-          <span>Impostor pode iniciar</span>
-          <div style={{ position: "relative" }}>
-            <input
-              type="checkbox"
-              className={styles.checkboxInput}
-              checked={impostorCanStart}
-              onChange={handleImpostorCanStart}
-            />
-            <span className={styles.switch}></span>
-          </div>
-        </label>
-        <label className={styles.checkboxLabel}>
-          <span>Impostor tem dica</span>
-          <div style={{ position: "relative" }}>
-            <input
-              type="checkbox"
-              className={styles.checkboxInput}
-              checked={impostorHint}
-              onChange={handleImpostorHintChange}
-            />
-            <span className={styles.switch}></span>
-          </div>
-        </label>
-      </div>
-
-      {/* Botão para mostrar/esconder categorias */}
-      <div className={styles.section} style={{ textAlign: "center" }}>
-        <button
-          type="button"
-          className={styles.optButton}
-          style={{
-            background: showCategories
-              ? "var(--gray-600)"
-              : "var(--plasma-blue)",
-            fontSize: "1.5rem",
-            padding: "10px 20px",
-            width: "auto",
-          }}
-          onClick={() => setShowCategories(!showCategories)}
-        >
-          {showCategories ? "Esconder Categorias" : "Selecionar Categorias"}
-        </button>
-      </div>
-
-      {/* Renderização Condicional das Categorias */}
-      {showCategories && (
-        <div className={styles.section}>
-          <p
-            style={{
-              marginBottom: "10px",
-              fontSize: "1.5rem",
-              color: "var(--tech-cyan)",
-            }}
-          >
-            Categorias de palavras Selecionadas:
-          </p>
-          <div className={styles.categoryGrid}>
-            {categories.map((cat, index) => (
-              <label key={index} className={styles.checkboxLabel}>
-                <span>{cat}</span>
-                <div style={{ position: "relative" }}>
-                  <input
-                    type="checkbox"
-                    className={styles.checkboxInput}
-                    checked={categorie.includes(cat)}
-                    onChange={() => handleCategorie(cat)}
-                  />
-                  <span className={styles.switch}></span>
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <button
-        onClick={startGame}
-        className={styles.startButton}
-        disabled={players.length < 3}
-      >
-        INICIAR JOGO
-      </button>
-    </div>
+  <button
+    onClick={startGame}
+    className={styles.startButton}
+    disabled={players.length < 3}
+  >
+    INICIAR MISSÃO
+  </button>
+</div>
   );
 }

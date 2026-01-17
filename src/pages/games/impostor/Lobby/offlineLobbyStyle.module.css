@@ -1,368 +1,378 @@
 .lobbyWrapper {
-  /* Ocupa o tamanho do container pai (contentWrapper) */
-  width: 90%;
-  max-width: 120rem;
-  margin: 0 auto;
-  padding: 2rem;
-  box-sizing: border-box;
-  margin-bottom: 10px;
-
-  /* Efeito de Vidro Fosco */
-  background: rgba(
-    50,
-    50,
-    50,
-    0.7
-  ); /* Simulação do gray-400 com transparência */
-  /* Se o var(--gray-400) for uma cor sólida, podemos usar assim: */
-  /* background: color-mix(in srgb, var(--gray-400), transparent 30%); */
-
-  backdrop-filter: blur(12px); /* O blur solicitado */
-  -webkit-backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  color: #ffffff;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
-  /* Responsividade */
+  width: 95%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 242, 255, 0.2);
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.headerArea {
+  text-align: center;
+  border-bottom: 1px solid var(--gray-700);
+  padding-bottom: 1.5rem;
 }
 
 .title {
-  font-family: "Lilita One", cursive;
-  font-size: 2.5rem;
-  text-align: center;
+  font-size: 2.2rem;
   color: var(--tech-cyan);
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
   margin: 0;
   text-shadow: 0 0 15px var(--tech-glow);
 }
 
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 5px;
+  letter-spacing: 1px;
+}
+
 .section {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.inputGroup {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.inputGroup input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  outline: none;
-}
-
-.playersList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 15px;
-  justify-content: center; /* Centraliza os crachás */
-}
-
-.playerTag {
-  background: rgba(42, 42, 50, 0.8); /* var(--gray-800) com transparência */
-  padding: 8px 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  /* Detalhe lateral de 'cor do tripulante' */
-  border-left: 4px solid var(--tech-cyan);
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease;
-  animation: slideIn 0.3s ease-out;
-}
-
-.playerTag:hover {
-  transform: translateY(-2px);
-  border-color: var(--tech-cyan);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.removeBtn {
-  background: rgba(255, 77, 77, 0.1);
-  border: 1px solid rgba(255, 77, 77, 0.3);
-  color: #ff4d4d;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 10px;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  padding: 0;
-  line-height: 0;
-}
-
-.removeBtn:hover {
-  background: #ff4d4d;
-  color: #fff;
-  transform: rotate(90deg) scale(1.2);
-  box-shadow: 0 0 10px rgba(255, 77, 77, 0.6);
-}
-
-/* Animação suave para quando o jogador aparece na lista */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.gridSettings {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  flex-direction: column;
   gap: 1rem;
 }
 
-.categoryGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
+.sectionTitle {
+  font-size: 1.4rem;
+  color: var(--gray-300);
+  letter-spacing: 1px;
+  margin: 0;
 }
 
-.startButton {
-  width: 90%;
-  align-self: center;
-  padding: 20px;
-  margin-top: 2rem;
-  font-size: 1.8rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  color: #fff;
-  cursor: pointer;
-  border: none;
+/* --- INPUTS --- */
+.inputGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.textInput {
+  flex: 1;
+  background: var(--gray-900);
+  border: 1px solid var(--gray-600);
+  padding: 15px 20px;
   border-radius: 12px;
-
-  /* Gradiente de Perigo/Ação */
-  background: var(--button-red);
-
-  /* Efeito 3D */
-  box-shadow:
-    0 6px 0 #7f1d1d,
-    0 12px 20px rgba(255, 0, 60, 0.3);
-
-  position: relative;
-  overflow: hidden; /* Necessário para o efeito de brilho interno */
-  transition: all 0.2s ease;
-  z-index: 1;
-}
-
-/* Efeito de Reflexo (Shine) que atravessa o botão */
-.startButton::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transform: skewX(-25deg);
-  transition: 0.5s;
-  pointer-events: none;
-}
-
-/* Animação do Reflexo ao passar o mouse */
-.startButton:hover:not(:disabled)::before {
-  left: 150%;
-  transition: 0.7s;
-}
-
-/* Estados de Interação */
-.startButton:hover:not(:disabled) {
-  transform: translateY(-4px);
-  box-shadow:
-    0 10px 0 #7f1d1d,
-    0 20px 30px rgba(255, 0, 60, 0.5);
-  filter: brightness(1.1);
-}
-
-.startButton:active:not(:disabled) {
-  transform: translateY(4px);
-  box-shadow:
-    0 2px 0 #7f1d1d,
-    0 5px 10px rgba(0, 0, 0, 0.4);
-}
-
-/* Botão Habilitado: Pulso de Energia */
-.startButton:not(:disabled) {
-  animation: pulseGlow 2s infinite;
-}
-
-/* Estado Desabilitado: Sistema Offline */
-.startButton:disabled {
-  background: var(--gray-600);
-  box-shadow: 0 4px 0 var(--gray-800);
-  color: var(--gray-400);
-  cursor: not-allowed;
-  opacity: 0.7;
-  letter-spacing: 2px;
-}
-
-/* Keyframes para o brilho pulsante */
-@keyframes pulseGlow {
-  0% {
-    box-shadow:
-      0 6px 0 #7f1d1d,
-      0 0 10px rgba(255, 0, 60, 0.3);
-  }
-  50% {
-    box-shadow:
-      0 6px 0 #7f1d1d,
-      0 0 25px rgba(255, 0, 60, 0.6);
-  }
-  100% {
-    box-shadow:
-      0 6px 0 #7f1d1d,
-      0 0 10px rgba(255, 0, 60, 0.3);
-  }
-}
-
-.optButton {
-  padding: 15px;
-  border-radius: 10px;
-  border: none;
-  background: var(--plasma-blue);
   color: white;
+  font-size: 1.2rem;
+  transition: border-color 0.3s;
+}
+
+.textInput:focus {
+  border-color: var(--tech-cyan);
+  outline: none;
+  box-shadow: 0 0 10px var(--tech-glow);
+}
+
+.removeBtn {
+  /* Reset de estilos */
+  appearance: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  
+  /* Dimensões e Forma */
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  
+  /* Cores (Baseadas no seu Danger Neon) */
+  background: rgba(255, 0, 60, 0.1);
+  border: 1px solid rgba(255, 0, 60, 0.3);
+  color: var(--danger-neon);
+  
+  /* Centralização PERFEITA do X */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Tipografia */
+  font-size: 18px; /* Ajuste conforme o gosto */
   font-weight: bold;
-  font-size: 1.5rem;
+  line-height: 0; /* Truque para não empurrar o texto para baixo */
+  
   cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0; /* Impede que o botão seja esmagado se o nome for longo */
 }
 
-.optButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(0, 234, 255, 0.4);
+.removeBtn:hover {
+  background: var(--danger-neon);
+  color: white;
+  border-color: white;
+  /* Efeito de rotação moderno */
+  transform: rotate(90deg);
+  box-shadow: 0 0 12px var(--danger-glow);
 }
 
-.optButton:disabled {
-  background: #555;
-  cursor: not-allowed;
-  opacity: 0.6;
+.removeBtn:active {
+  transform: scale(0.9) rotate(90deg);
 }
 
-/*CHECKBOX */
-/* Esconde o checkbox real mas mantém acessível */
+.addButton {
+  border-radius: 12px;
+  border: 1px solid var(--plasma-blue);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--tech-cyan);
+  padding: 0 25px;
+  border-radius: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: 0.2s;
+}
+
+.addButton:hover {
+  transform: scale(1.02);
+  filter: brightness(1.2);
+}
+
+/* --- LISTA DE JOGADORES --- */
+.playersList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.playerTag {
+  background: var(--gray-800);
+  padding: 10px 15px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideIn 0.3s ease-out;
+}
+
+.pName {
+  font-size: 1.3rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dotIndicator {
+  width: 8px;
+  height: 8px;
+  background: var(--tech-cyan);
+  border-radius: 50%;
+  margin-right: 10px;
+  box-shadow: 0 0 8px var(--tech-cyan);
+}
+
+/* --- COUNTER --- */
+.counterRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 15px 20px;
+  border-radius: 15px;
+}
+
+.counterControls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.countBtn {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-500);
+  background: var(--gray-700);
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.countDisplay {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--tech-cyan);
+  min-width: 30px;
+  text-align: center;
+}
+
+/* --- GRID SETTINGS (SWITCHES) --- */
+.gridSettings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.checkboxLabel {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 18px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.checkText {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* --- SWITCH STYLE --- */
+.switchWrapper {
+  position: relative;
+  width: 55px;
+  height: 30px;
+}
+
 .checkboxInput {
-  position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-/* O Label que envolve tudo */
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Espaça o texto do switch */
-  gap: 15px;
-  cursor: pointer;
-  padding: 12px 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s ease;
-  user-select: none;
-}
-
-.checkboxLabel:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(0, 242, 255, 0.2);
-}
-
-/* O Switch (Trilho) */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 46px;
-  height: 24px;
-  background-color: var(--gray-700);
-  border-radius: 20px;
-  transition: 0.4s;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* A Bolinha (Slider) */
-.switch::before {
-  content: "";
+.switchSlider {
   position: absolute;
-  height: 16px;
-  width: 16px;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--gray-700);
+  transition: .4s;
+  border-radius: 34px;
+  border: 1px solid var(--gray-500);
+}
+
+.switchSlider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
   left: 4px;
   bottom: 3px;
-  background-color: #fff;
+  background-color: white;
+  transition: .4s;
   border-radius: 50%;
-  transition: 0.4s cubic-bezier(0.18, 0.89, 0.35, 1.15);
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
-/* Estado Ativado (Plasma Blue) */
-.checkboxInput:checked + .switch {
-  background-color: var(--plasma-blue);
+.checkboxInput:checked + .switchSlider {
+  background-color: var(--tech-cyan);
   box-shadow: 0 0 15px var(--plasma-glow);
-  border-color: var(--tech-cyan);
 }
 
-.checkboxInput:checked + .switch::before {
-  transform: translateX(20px);
-  background-color: #fff;
+.checkboxInput:checked + .switchSlider:before {
+  transform: translateX(24px);
 }
 
-/* Estilo para quando for opção de Impostor (Opcional - Vermelho) */
-.dangerSwitch:checked + .switch {
-  background-color: var(--danger-neon);
-  box-shadow: 0 0 15px var(--danger-glow);
-  border-color: #ff4d4d;
+/* --- CATEGORIAS --- */
+.categoryToggle {
+  width: 100%;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid var(--plasma-blue);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--tech-cyan);
+  font-weight: 800;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-@media (max-width: 768px) {
+.categoryToggle:hover {
+  transform: scale(1.02);
+  filter: brightness(1.2);
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.categoryItem {
+  cursor: pointer;
+}
+
+.categoryBox {
+  display: block;
+  padding: 10px;
+  text-align: center;
+  background: var(--gray-800);
+  border: 1px solid var(--gray-600);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.checkboxInput:checked + .categoryBox {
+  background: var(--tech-cyan);
+  color: var(--gray-900);
+  font-weight: bold;
+  border-color: white;
+}
+
+/* --- BOTÃO INICIAR --- */
+.startButton {
+  padding: 25px;
+  border-radius: 15px;
+  border: none;
+  background: var(--button-red);
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255, 0, 60, 0.3);
+  transition: transform 0.2s;
+}
+
+.startButton:hover:not(:disabled) {
+  transform: scale(1.02);
+  filter: brightness(1.2);
+}
+
+.startButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--gray-600);
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 600px) {
   .lobbyWrapper {
-    width: 95%; /* quase toda a tela no celular */
-    padding-inline: 1rem;
-    padding-top: 2rem;
+    padding: 1.5rem;
+    width: 98%;
   }
+
+  .title { font-size: 1.8rem; }
+  
+  .inputGroup { flex-direction: column; }
+  
+  .addButton { padding: 15px; }
+
+  .gridSettings { grid-template-columns: 1fr; }
+
+  .checkText { font-size: 1.1rem; }
 }
 
-@media (max-width: 480px) {
-  .lobbyWrapper {
-    width: 98%; /* tela pequena, ocupa tudo */
-    padding-inline: 0.7rem;
-    padding-top: 2rem;
-  }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

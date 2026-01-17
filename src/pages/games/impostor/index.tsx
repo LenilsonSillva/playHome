@@ -1,7 +1,7 @@
 import LobbyImportor from "./Lobby";
 import React, { useMemo } from "react";
 import styles from "./index-impostor.module.css";
-import rocket from "../../../../public/rocket.png";
+import rocket from "../../../../src/assets/rocket.png";
 
 export function Impostor() {
   const randomPath = useMemo(() => {
