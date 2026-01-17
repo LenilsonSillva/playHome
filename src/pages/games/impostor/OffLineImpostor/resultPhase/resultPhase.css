@@ -1,0 +1,256 @@
+.result-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.result-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* BANNER DE VITÓRIA */
+.victory-banner {
+  margin: -20px -20px 30px -20px;
+  padding: 30px;
+  text-align: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.crew-bg {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 242, 255, 0.2) 0%,
+    transparent 100%
+  );
+  border-bottom: 3px solid var(--tech-cyan);
+}
+
+.impostor-bg {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 0, 60, 0.2) 0%,
+    transparent 100%
+  );
+  border-bottom: 3px solid var(--danger-neon);
+}
+
+.victory-title {
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.crew-bg .victory-title {
+  color: var(--tech-cyan);
+}
+.impostor-bg .victory-title {
+  color: var(--danger-neon);
+}
+
+.victory-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+/* PÓDIO */
+.section-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  border-left: 3px solid var(--plasma-blue);
+  padding-left: 10px;
+  text-align: left;
+}
+
+.podium-grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 15px;
+  margin-bottom: 40px;
+  padding-top: 20px;
+}
+
+.podium-item {
+  flex: 1;
+  background: var(--gray-800);
+  border: 1px solid var(--gray-700);
+  border-radius: 12px;
+  padding: 15px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Destaque para o Primeiro Lugar */
+.rank-1 {
+  transform: scale(1.1);
+  border-color: var(--caution-amber);
+  background: linear-gradient(180deg, var(--gray-800) 0%, #2d260a 100%);
+  z-index: 2;
+}
+
+.rank-badge {
+  position: absolute;
+  top: -15px;
+  background: var(--gray-700);
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 1px solid var(--gray-500);
+}
+
+.rank-1 .rank-badge {
+  background: var(--caution-amber);
+  color: #000;
+  border-color: #fff;
+}
+
+.p-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-top: 5px;
+  color: #fff;
+}
+
+.p-score {
+  font-size: 1.1rem;
+  color: var(--tech-cyan);
+  font-weight: 800;
+}
+
+.p-role {
+  font-size: 0.8rem;
+  color: var(--danger-neon);
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+.p-role-small {
+  font-size: 0.6rem;
+  color: var(--danger-neon);
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+/* LISTA DE OUTROS JOGADORES */
+
+.others-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.other-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.other-name {
+  flex: 1;
+  text-align: left;
+  font-size: 1.2rem;
+}
+
+.other-stats {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.other-emoji {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.round-pts {
+  font-size: 0.9rem;
+  color: var(--success);
+}
+
+.total-pts {
+  font-weight: bold;
+  color: var(--plasma-blue);
+}
+
+/* BOTÕES */
+.result-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.primary-btn {
+  background: var(--button-tech);
+  color: #fff;
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid var(--gray-600);
+  color: var(--text-muted);
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Responsividade PC */
+@media (min-width: 768px) {
+  .victory-title {
+    font-size: 2.5rem;
+  }
+  .victory-subtitle {
+    font-size: 1.2rem;
+  }
+  .p-name {
+    font-size: 1.7rem;
+  }
+  .p-role {
+    font-size: 1rem;
+  }
+  .p-score {
+    font-size: 1.5rem;
+  }
+  .section-label {
+    font-size: 1.2rem;
+  }
+  .podium-grid {
+    gap: 30px;
+  }
+  .other-name {
+    font-size: 1.7rem;
+  }
+  .other-emoji {
+    font-size: 3rem;
+  }
+  .other-stats {
+    font-size: 1.5rem;
+  }
+  .round-pts {
+    font-size: 1.1rem;
+  }
+}

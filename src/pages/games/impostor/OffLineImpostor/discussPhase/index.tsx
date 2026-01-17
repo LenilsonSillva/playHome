@@ -13,7 +13,9 @@ type DiscussPhaseProps = {
 
 export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
   const [seconds, setSeconds] = useState(0);
-  const aliveImpostorsCount = data.players.filter(p => p.isImpostor && p.isAlive).length;
+  const aliveImpostorsCount = data.players.filter(
+    (p) => p.isImpostor && p.isAlive,
+  ).length;
 
   useEffect(() => {
     const interval = setInterval(() => setSeconds((p) => p + 1), 1000);
@@ -43,19 +45,20 @@ export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
         </div>
 
         <div className={styles.statusBox}>
-  {data.whoStart && (
-    <p className={styles.startInfo}>
-      📡 <strong>{data.whoStart}</strong> captou algo e inicia a rodada.
-    </p>
-  )}
-  
-  <p className={styles.impostorCount}>
-    ⚠️{" "}
-    {aliveImpostorsCount === 1
-      ? "1 IMPOSTOR VIVO"
-      : `${aliveImpostorsCount} IMPOSTORES VIVOS`}
-  </p>
-</div>
+          {data.whoStart && (
+            <p className={styles.startInfo}>
+              📡 <strong>{data.whoStart.toUpperCase()}</strong> captou algo e
+              inicia a rodada.
+            </p>
+          )}
+
+          <p className={styles.impostorCount}>
+            ⚠️{" "}
+            {aliveImpostorsCount === 1
+              ? "1 IMPOSTOR VIVO"
+              : `${aliveImpostorsCount} IMPOSTORES VIVOS`}
+          </p>
+        </div>
 
         <div className={styles.playerGrid}>
           {sortedPlayers.map((p) => (

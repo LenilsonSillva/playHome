@@ -3,55 +3,114 @@ import type { GameData, ImpostorPlayer } from "./types";
 import { WORDS, type WordData } from "./words";
 
 export function getImpostorCount(playersCount: number): number {
-  if (playersCount >= 6) return 3;
-  if (playersCount >= 4) return 2;
+  if (playersCount >= 7) return 3;
+  if (playersCount >= 5) return 2;
   return 1;
 }
 
 const PLAYER_ICONS = [
-  "🤫", "😁", "👾", "👨‍🚀", "👩‍🚀", "👽", "🤖", "😎", "🫥", "🤔", 
-  "🤐", "😶‍🌫️", "😶", "🫠", "🥸", "🤥", "🫣", "🧐", "👹", "🫢",
-  "🤓", "😈", "👿", "💀", "👻", "👺", "🧞‍♀️", "🧞‍♂️", "🧟", "🧌",
-  "👨🏻", "👨🏽", "👩🏽", "👩🏻", "🤴🏻", "👸🏻", "🧑🏻‍🎄", "🕵🏻‍♀️", "🦹🏻", "🦸🏻", 
-  "🧙🏻", "🧛🏻"
+  "🤫",
+  "😁",
+  "👾",
+  "🧑🏻‍🚀",
+  "👩🏽‍🚀",
+  "👽",
+  "🤖",
+  "😎",
+  "🫥",
+  "🤔",
+  "🤐",
+  "😶‍🌫️",
+  "😶",
+  "🫠",
+  "🥸",
+  "🤥",
+  "🫣",
+  "🧐",
+  "👹",
+  "🫢",
+  "🤓",
+  "😈",
+  "👿",
+  "💀",
+  "👻",
+  "👺",
+  "🧞‍♀️",
+  "🧞‍♂️",
+  "🧟",
+  "🧌",
+  "👨🏻",
+  "👨🏽",
+  "👩🏽",
+  "👩🏻",
+  "🤴🏻",
+  "👸🏻",
+  "🧑🏻‍🎄",
+  "🕵🏻‍♀️",
+  "🦹🏻",
+  "🦸🏻",
+  "🧙🏻",
+  "🧛🏻",
 ];
 
 const ICON_COLORS = [
-  "#ff003c", "#3b82f6", "#facc15", "#10b981", "#6d28d9", 
-  "#00f2ff", "#ff7b00", "#ff00fb", "#00ff40", "#ffffff",
-  "#7f1d1d", "#075985", "#a16207", "#065f46", "#4c1d95",
-  "#0891b2", "#b91c1c", "#1d4ed8", "#eab308", "#22c55e"
+  "#ff003c",
+  "#3b82f6",
+  "#facc15",
+  "#51890c",
+  "#6d28d9",
+  "#19a5ac",
+  "#ff7b00",
+  "#ff00fb",
+  "#00ff40",
+  "#69166b",
+  "#7f1d1d",
+  "#075985",
+  "#a16207",
+  "#065f46",
+  "#4c1d95",
+  "#13697f",
+  "#b91c1c",
+  "#1d4ed8",
+  "#ba8d07",
+  "#777777",
 ];
 
+// 1. Melhoria no Shuffle (Fisher-Yates) para garantir aleatoriedade real
 function shuffleArray<T>(array: T[]): T[] {
-  return [...array].sort(() => Math.random() - 0.5);
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
 }
 
 // LOGICA DE HISTÓRICO: Bloqueia quem foi impostor 2 vezes seguidas
 export function pickImpostors(
   playerIds: string[],
   impostorCount: number,
-  impostorHistory: string[][] = [],
+  impostorHistory: string[][] = [], // Ex: [['id1', 'id2'], ['id1', 'id3']]
 ): string[] {
-  const lastTwo = impostorHistory.slice(-2).flat();
-  const count: Record<string, number> = {};
-  
-  lastTwo.forEach((id) => {
-    count[id] = (count[id] || 0) + 1;
-  });
+  // Pegamos as duas últimas rodadas separadamente
+  const lastRound = impostorHistory[impostorHistory.length - 1] || [];
+  const secondLastRound = impostorHistory[impostorHistory.length - 2] || [];
 
-  // Se o ID aparece 2 vezes nas últimas 2 rodadas, ele é bloqueado
-  const blocked = Object.entries(count)
-    .filter(([_, c]) => c >= 2)
-    .map(([id]) => id);
+  // Um jogador é bloqueado se ele foi impostor na ÚLTIMA E na PENÚLTIMA rodada
+  const blocked = playerIds.filter(
+    (id) => lastRound.includes(id) && secondLastRound.includes(id),
+  );
 
-  const candidates = playerIds.filter((id) => !blocked.includes(id));
-  
-  // Se houver candidatos suficientes, usa apenas eles. 
-  // Caso contrário (em grupos muito pequenos), libera geral para não travar o sorteio.
-  let pool = candidates.length >= impostorCount ? candidates : playerIds;
-  
-  const shuffled = shuffleArray(pool);
+  // Candidatos são aqueles que não estão bloqueados
+  let candidates = playerIds.filter((id) => !blocked.includes(id));
+
+  // Segurança: Se o número de candidatos for menor que a quantidade de impostores necessária
+  // (ex: grupo muito pequeno onde todos já foram impostores), liberamos os bloqueados
+  if (candidates.length < impostorCount) {
+    candidates = playerIds;
+  }
+
+  const shuffled = shuffleArray(candidates);
   return shuffled.slice(0, impostorCount);
 }
 
@@ -74,7 +133,8 @@ function createImpostorPlayers(
 
     // Preservação de Score e GlobalScore
     const currentScore = typeof pAny.score === "number" ? pAny.score : 0;
-    const currentGlobal = typeof pAny.globalScore === "number" ? pAny.globalScore : currentScore;
+    const currentGlobal =
+      typeof pAny.globalScore === "number" ? pAny.globalScore : currentScore;
 
     return {
       ...p,
@@ -96,13 +156,13 @@ function selectWhoStart(
   impostorCanStart: boolean,
 ): string | undefined {
   if (!whoStartButton) return undefined;
-  
+
   const candidate = pickRandom(playersData);
 
   if (candidate.isImpostor && !impostorCanStart) {
     return selectWhoStart(playersData, whoStartButton, impostorCanStart);
-  } 
-  
+  }
+
   return candidate.name;
 }
 
@@ -116,20 +176,40 @@ function distributeWords(
   selectedCategories: string[],
   wordBank: WordData[],
   impostorHasHint: boolean,
-): ImpostorPlayer[] {
-  const filteredWords = wordBank.filter((word) =>
+  usedWords: string[] = [],
+): { updatedPlayers: ImpostorPlayer[]; chosenWord: string[] } {
+  // 1. Filtra por categorias selecionadas
+  let filteredWords = wordBank.filter((word) =>
     selectedCategories.includes(word.category),
   );
-  const word = pickRandom(filteredWords.length > 0 ? filteredWords : wordBank);
 
-  const nonImpostors = players.filter(p => !p.isImpostor);
+  // 2. Filtra removendo as palavras que já foram usadas nesta sessão
+  let availableWords = filteredWords.filter((w) => {
+    const isMainWordUsed = usedWords.includes(w.word);
+    const isAnyRelatedWordUsed = w.related?.some((r) => usedWords.includes(r));
+    return !isMainWordUsed && !isAnyRelatedWordUsed;
+  });
+
+  // 3. Fallback: Se todas as palavras da categoria acabarem, reseta o pool daquela categoria
+  if (availableWords.length === 0) {
+    availableWords = filteredWords.length > 0 ? filteredWords : wordBank;
+  }
+
+  const word = pickRandom(availableWords);
+
+  // Identificar quais strings serão usadas nesta rodada para salvar no histórico
+  const wordA = word.word;
+  const wordB =
+    twoWordsMode && word.related && word.related.length > 0
+      ? word.related[0]
+      : wordA;
+
+  const nonImpostors = players.filter((p) => !p.isImpostor);
   const getGroupASize = Math.floor(nonImpostors.length / 2);
-
-  // Sorteia quem do grupo civil recebe a palavra relacionada (se houver)
-  const shuffledCivils = shuffleArray(nonImpostors.map(p => p.id));
+  const shuffledCivils = shuffleArray(nonImpostors.map((p) => p.id));
   const groupAIds = shuffledCivils.slice(0, getGroupASize);
 
-  return players.map((player) => {
+  const updatedPlayers = players.map((player) => {
     if (player.isImpostor) {
       return {
         ...player,
@@ -137,16 +217,13 @@ function distributeWords(
         hint: impostorHasHint ? word.hint : undefined,
       };
     } else {
-      const assignedWord = twoWordsMode && groupAIds.includes(player.id) && word.related
-          ? word.related.toString()
-          : word.word;
-
-      return {
-        ...player,
-        word: assignedWord,
-      };
+      const finalWord =
+        twoWordsMode && groupAIds.includes(player.id) ? wordB : wordA;
+      return { ...player, word: finalWord };
     }
   });
+
+  return { updatedPlayers, chosenWord: [wordA, wordB] }; // Retornamos a palavra para salvar no histórico
 }
 
 export function initializeGame(
@@ -158,34 +235,37 @@ export function initializeGame(
   whoStartButton: boolean,
   impostorCanStart: boolean,
   impostorHistory: string[][] = [],
-): GameData {
+  usedWords: string[] = [], // <--- NOVO PARÂMETRO
+): GameData & { chosenWord: string[] } {
   const impostorTrueOrFalse = createImpostorPlayers(
     allPlayers,
     howManyImpostors,
-    impostorHistory, // HISTÓRICO PASSADO AQUI
+    impostorHistory,
   );
 
-  const setWordAndData = distributeWords(
+  const { updatedPlayers, chosenWord } = distributeWords(
     impostorTrueOrFalse,
     twoWordsMode,
     selectedCategories,
     WORDS,
     impostorHasHint,
+    usedWords, // <--- PASSA PARA O DISTRIBUTE
   );
 
   const setWhoStart = selectWhoStart(
-    setWordAndData,
+    updatedPlayers,
     whoStartButton,
     impostorCanStart,
   );
 
   return {
-    allPlayers: setWordAndData,
+    allPlayers: updatedPlayers,
     howManyImpostors,
     twoWordsMode,
     impostorHasHint,
     selectedCategories,
     whoStart: setWhoStart,
     impostorCanStart,
+    chosenWord, // <--- RETORNA A PALAVRA SORTEADA
   };
 }

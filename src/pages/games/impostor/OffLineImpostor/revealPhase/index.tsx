@@ -10,9 +10,15 @@ type DiscussPhaseProps = {
   data: GameRouteState["data"];
   onNextPhase: (phase: ImpostorGameState["phase"]) => void;
   onExit: () => void;
+  onReroll: () => void;
 };
 
-export function RevealPhase({ data, onNextPhase, onExit }: DiscussPhaseProps) {
+export function RevealPhase({
+  data,
+  onNextPhase,
+  onExit,
+  onReroll,
+}: DiscussPhaseProps) {
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const player = data.players[index];
@@ -21,6 +27,19 @@ export function RevealPhase({ data, onNextPhase, onExit }: DiscussPhaseProps) {
     setRevealed(false);
     setIndex((prev) => prev + 1);
   }
+
+  const handleRerollAction = () => {
+    // Apenas reinicia se o usuário confirmar
+    if (
+      window.confirm(
+        "Trocar palavra e sortear novos impostores? (Pontuação será mantida)",
+      )
+    ) {
+      onReroll();
+      setIndex(0); // Volta para o primeiro jogador
+      setRevealed(false);
+    }
+  };
 
   useEffect(() => {
     if (!player) {
@@ -38,7 +57,11 @@ export function RevealPhase({ data, onNextPhase, onExit }: DiscussPhaseProps) {
         onClick={onExit}
         title="Voltar ao Início"
       >
-        ← SAIR
+        <strong className={styles.exitAndRerolEmoji}>⬅️</strong> SAIR
+      </button>
+      {/* Botão Trocar à Direita */}
+      <button className={styles.rerollBtn} onClick={handleRerollAction}>
+        TROCAR PALAVRA <strong className={styles.exitAndRerolEmoji}> 🔄</strong>
       </button>
 
       <div className={styles.revealCard}>

@@ -1,4 +1,3 @@
-// PlayerAvatar.tsx
 import React from "react";
 import "./PlayerAvatar.css";
 
@@ -18,6 +17,9 @@ export function PlayerAvatar({
   const width = size;
   const height = size * 1.33;
 
+  // Verde clássico de monitor antigo (Phosphor Green)
+  const retroGreen = "#00ff41";
+
   return (
     <div
       style={
@@ -26,7 +28,7 @@ export function PlayerAvatar({
           height: `${height}px`,
           borderRadius: "4px",
           backgroundColor: "#0a0f1a",
-          border: `2px solid ${color}`,
+          border: `2px solid ${color}`, // Mantém a cor do jogador na borda
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -34,16 +36,13 @@ export function PlayerAvatar({
           flexShrink: 0,
           position: "relative",
           overflow: "hidden",
+          marginTop: "15px",
+          marginBottom: "8px",
         } as React.CSSProperties
       }
     >
-      <span style={{ zIndex: 1 }}>{emoji}</span>
+      <span style={{ zIndex: 1, fontSize: (width + height) / 3 }}>{emoji}</span>
 
-      {/* 
-         A lógica aqui é: 
-         Se hideScan for TRUE, o '!' inverte para FALSE e o componente NÃO renderiza.
-         Se hideScan for FALSE (padrão), o '!' inverte para TRUE e o scanner APARECE.
-      */}
       {!hideScan && (
         <div
           style={
@@ -52,15 +51,18 @@ export function PlayerAvatar({
               top: 0,
               left: 0,
               width: "100%",
-              height: "3px",
-              background: `linear-gradient(to right, transparent, #fff 10%, ${color} 50%, #fff 90%, transparent)`,
-              boxShadow: `0 0 10px 1px ${color}`,
-              animation: "scanLine 2.5s linear infinite", // O nome aqui deve bater com o CSS
+              height: "1px", // Linha bem fina
+              background: `linear-gradient(to right, transparent, ${retroGreen} 50%, transparent)`,
+              boxShadow: `0 0 8px 1px ${retroGreen}`, // Brilho de fósforo
+              animation: "scanLine 2.5s linear infinite",
               zIndex: 2,
             } as React.CSSProperties
           }
         />
       )}
+
+      {/* Opcional: Efeito de Scanlines estáticas (linhas horizontais de fundo) para o PC Antigo */}
+      <div className="crt-overlay"></div>
     </div>
   );
 }

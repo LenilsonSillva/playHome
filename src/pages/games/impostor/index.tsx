@@ -16,7 +16,7 @@ export function Impostor() {
   }, []);
 
   const comets = useMemo(() => {
-    return Array.from({ length: 10 }).map((_, i) => ({
+    return Array.from({ length: 10 }).map((_) => ({
       left: `${Math.random() * 100}%`,
       delay: `${Math.random() * 15}s`,
       duration: `${2 + Math.random() * 5}s`,

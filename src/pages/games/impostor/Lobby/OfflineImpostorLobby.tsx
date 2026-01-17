@@ -16,10 +16,15 @@ export function OfflineImpostorLobby() {
   const initialCategories = [
     "Objetos",
     "Animais",
-    "Frutas",
+    "Ciência",
     "Plantas",
     "Natureza",
     "Comida",
+    "Emoções",
+    "Gramática e Substantivos",
+    "Lugares",
+    "Países e Cidades",
+    "Tecnologia",
   ];
   const [categorie, setCategorie] = useState<string[]>(initialCategories);
   const [impostorHint, setImpostorHint] = useState<boolean>(false);

@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import type {
   GameRouteState,
   ImpostorGameState,
 } from "../../GameLogistic/types";
-import { useNavigate } from "react-router-dom";
+import { PlayerAvatar } from "../PlayerAvatar/PlayerAvatar";
+import "./resultPhase.css";
+
 type DiscussPhaseProps = {
   data: GameRouteState["data"];
   onNextPhase: (phase: ImpostorGameState["phase"]) => void;
@@ -15,119 +18,144 @@ export function ResultPhase({
   onNextRound,
 }: DiscussPhaseProps) {
   const navigate = useNavigate();
-  // Jogadores eliminados nesta rodada
-  const eliminatedPlayers = data.players.filter((p) => !p.isAlive);
-  const impostors = data.players.filter((p) => p.isImpostor);
-  const aliveImpostors = impostors.filter((p) => p.isAlive);
-  const eliminatedImpostors = impostors.filter((p) => !p.isAlive);
+
+  // 1. Cálculos de sobreviventes
   const alivePlayers = data.players.filter((p) => p.isAlive);
-  const survivors = alivePlayers.filter((p) => !p.isImpostor);
+  const aliveImpostors = alivePlayers.filter((p) => p.isImpostor).length;
+  const aliveCrew = alivePlayers.length - aliveImpostors;
 
-  // Pontuação
-  const scores: Record<string, number> = {};
-  data.players.forEach((p) => {
-    if (p.isImpostor) {
-      if (p.isAlive) {
-        scores[p.name] = 2;
-      } else {
-        scores[p.name] = -1.5;
-      }
-    } else {
-      if (p.isAlive) {
-        scores[p.name] = 1;
-      } else {
-        scores[p.name] = 0;
-      }
-    }
-  });
+  // 2. Lógica de Vitória (Refinada)
+  const crewWon = aliveImpostors === 0;
+  // Impostores vencem se o número deles for >= ao da tripulação (Ex: 1x1, 2x2, 2x1)
+  const impostorsWon = aliveImpostors >= aliveCrew && aliveImpostors > 0;
+  const gameOver = crewWon || impostorsWon;
 
-  // Mensagem de resultado
-  let resultMsg = "";
-  if (eliminatedImpostors.length > 0) {
-    resultMsg = `Impostor${eliminatedImpostors.length > 1 ? "es" : ""} eliminado${eliminatedImpostors.length > 1 ? "s" : ""}!`;
-  } else {
-    resultMsg = "Nenhum impostor foi eliminado nesta rodada.";
-  }
+  // 3. Cálculo de Pontos (Mesma lógica do handleNextRound no pai)
+  const getRoundPoints = (p: any) => {
+    if (p.isImpostor) return p.isAlive ? 2 : -1.5;
+    return p.isAlive ? 1 : 0;
+  };
 
-  // Lógica de fim de jogo
-  const impostorsLeft = aliveImpostors.length;
-  const totalAlive = alivePlayers.length;
-  const onlyImpostorsAlive = impostorsLeft === totalAlive && totalAlive > 0;
-  const twoPlayersLeftWithImpostor =
-    totalAlive === 2 && aliveImpostors.length >= 1;
-  const gameOver =
-    impostorsLeft === 0 || onlyImpostorsAlive || twoPlayersLeftWithImpostor;
+  // Mapeia jogadores com pontos da rodada e total acumulado para o pódio
+  const playersWithTotalScore = data.players
+    .map((p) => ({
+      ...p,
+      roundPoints: getRoundPoints(p),
+      totalScore: (p.score || 0) + getRoundPoints(p),
+    }))
+    .sort((a, b) => b.totalScore - a.totalScore); // Do maior para o menor
+
+  const podium = playersWithTotalScore.slice(0, 3);
+  const others = playersWithTotalScore.slice(3);
 
   return (
-    <div>
-      <h2>Resultado da Rodada</h2>
-      <p>{resultMsg}</p>
-      <p>
-        Total de jogadores vivos: <strong>{totalAlive}</strong>
-      </p>
-      {impostors.length > 1 && (
-        <p>
-          Impostores restantes: <strong>{impostorsLeft}</strong>
-        </p>
-      )}
-      {gameOver &&
-        (() => {
-          // Ordena por pontuação acumulada (score + rodada)
-          const playersSorted = [...data.players].sort((a, b) => {
-            const aTotal =
-              (typeof a.score === "number" ? a.score : 0) +
-              (scores[a.name] ?? 0);
-            const bTotal =
-              (typeof b.score === "number" ? b.score : 0) +
-              (scores[b.name] ?? 0);
-            return bTotal - aTotal;
-          });
-          return (
+    <div className="main-bg result-screen">
+      <div className="glass-panel result-container">
+        {/* BANNER DE VITÓRIA */}
+        {gameOver ? (
+          <div
+            className={`victory-banner ${crewWon ? "crew-bg" : "impostor-bg"}`}
+          >
+            <h1 className="victory-title">
+              {crewWon ? "VITÓRIA DA TRIPULAÇÃO" : "VITÓRIA DOS IMPOSTORES"}
+            </h1>
+            <p className="victory-subtitle">
+              {crewWon
+                ? "Todos os impostores foram ejetados da nave."
+                : `A tripulação não tem mais votos suficientes. Restaram ${aliveCrew} tripulante(s).`}
+            </p>
+          </div>
+        ) : (
+          /* Caso o jogo ainda não tenha acabado (fluxo de segurança) */
+          <div className="round-report-header">
+            <h2 className="tech-title">RELATÓRIO DE STATUS</h2>
+            <p className="status-text">
+              A missão continua. Tripulantes: {aliveCrew} | Impostores:{" "}
+              {aliveImpostors}
+            </p>
+          </div>
+        )}
+
+        {/* PÓDIO - TOP 3 */}
+        <div className="podium-section">
+          <h3 className="section-label">LÍDERES DA MISSÃO</h3>
+          <div className="podium-grid">
+            {podium.map((p, index) => (
+              <div key={p.id} className={`podium-item rank-${index + 1}`}>
+                <div className="rank-badge">{index + 1}º</div>
+                {/* Avatar com tamanho maior para o 1º lugar */}
+                <PlayerAvatar
+                  emoji={(p as any).emoji}
+                  color={p.color}
+                  size={index === 0 ? 85 : 65}
+                />
+                <span className="p-name">{p.name}</span>
+                <span className="p-score">{p.totalScore} pts</span>
+                {/* Revela quem era impostor apenas no pódio final */}
+                {p.isImpostor && <span className="p-role">IMPOSTOR</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* LISTA GERAL (RESTO DOS JOGADORES) */}
+        {others.length > 0 && (
+          <div className="others-section">
+            <h3 className="section-label">REGISTROS ADICIONAIS</h3>
+            <div className="others-list">
+              {others.map((p) => (
+                <div key={p.id} className="other-item">
+                  <span className="other-emoji">{(p as any).emoji}</span>
+                  <span className="other-name">{p.name}</span>
+                  <div className="other-info-main">
+                    {p.isImpostor && (
+                      <span className="p-role-small">IMPOSTOR</span>
+                    )}
+                  </div>
+                  <div className="other-stats">
+                    <span
+                      className="round-pts"
+                      style={{
+                        color:
+                          p.roundPoints > 0
+                            ? "var(--success)"
+                            : "var(--danger-neon)",
+                      }}
+                    >
+                      {p.roundPoints > 0 ? `+${p.roundPoints}` : p.roundPoints}
+                    </span>
+                    <span className="total-pts">{p.totalScore} pts</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* AÇÕES FINAIS */}
+        <div className="result-actions">
+          {gameOver ? (
             <>
-              <h3>Pontuação da Rodada</h3>
-              <ul>
-                {playersSorted.map((p) => (
-                  <li key={p.id}>
-                    {p.name}: {scores[p.name]} ponto
-                    {Math.abs(scores[p.name]) === 1 ? "" : "s"}
-                    {p.isImpostor ? " (Impostor)" : ""}
-                  </li>
-                ))}
-              </ul>
-              <h3>Pontuação Acumulada</h3>
-              <ul>
-                {playersSorted.map((p) => {
-                  const roundScore = scores[p.name] ?? 0;
-                  const prevScore = typeof p.score === "number" ? p.score : 0;
-                  const totalScore = prevScore + roundScore;
-                  return (
-                    <li key={p.id}>
-                      {p.name}: {totalScore} ponto
-                      {Math.abs(totalScore) === 1 ? "" : "s"}
-                      {p.isImpostor ? " (Impostor)" : ""}
-                    </li>
-                  );
-                })}
-              </ul>
+              <button className="primary-btn pulse" onClick={onNextRound}>
+                PRÓXIMA PALAVRA
+              </button>
+              <button
+                className="secondary-btn"
+                onClick={() => navigate("/games/impostor/lobby")}
+              >
+                VOLTAR AO LOBBY
+              </button>
             </>
-          );
-        })()}
-      {gameOver ? (
-        <>
-          <button onClick={() => navigate("/games/impostor/lobby")}>
-            Voltar ao Lobby
-          </button>
-          {onNextRound && (
-            <button style={{ marginLeft: 8 }} onClick={onNextRound}>
-              Próxima Rodada
+          ) : (
+            <button
+              className="primary-btn"
+              onClick={() => onNextPhase("discussion")}
+            >
+              RETORNAR À DISCUSSÃO
             </button>
           )}
-        </>
-      ) : (
-        <button onClick={() => onNextPhase("discussion")}>
-          Continuar Rodada
-        </button>
-      )}
+        </div>
+      </div>
     </div>
   );
 }
