@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { usePlayers } from "../../../../contexts/contextHook";
 import { getImpostorCount, initializeGame } from "../GameLogistic/gameLogistic";
 import { useNavigate } from "react-router-dom";
-import { categories } from "../GameLogistic/words";
+import { categories } from "../../../../data/words";
 import styles from "./offlineLobbyStyle.module.css";
 import type { GameRouteState } from "../GameLogistic/types";
 

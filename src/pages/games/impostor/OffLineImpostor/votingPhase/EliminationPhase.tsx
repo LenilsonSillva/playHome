@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { GameRouteState } from "../../GameLogistic/types";
 import "./eliminationPhase.css";
-import { PlayerAvatar } from "../PlayerAvatar/PlayerAvatar";
+import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
 
 type EliminationProps = {
   data: GameRouteState["data"];

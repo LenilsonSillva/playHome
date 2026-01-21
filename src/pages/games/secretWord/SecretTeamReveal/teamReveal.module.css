@@ -1,0 +1,260 @@
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.header {
+  text-align: center;
+}
+
+.badge {
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  color: var(--tech-cyan);
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* GRID RESPONSIVO: 1 col no mobile, 2 ou 3 no PC */
+.teamsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.teamCard {
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 5px solid var(--team-color);
+  transition: transform 0.3s ease;
+}
+
+.teamCard:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.teamHeader {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 10px;
+}
+
+.teamIndex {
+  font-family: monospace;
+  font-size: 1.3rem;
+  color: var(--team-color);
+  font-weight: bold;
+}
+
+.teamName {
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--gray-100);
+}
+
+.membersList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.memberItem {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--gray-300);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: var(--team-color);
+  border-radius: 50%;
+  margin-right: 12px;
+  box-shadow: 0 0 8px var(--team-color);
+}
+
+.footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.instruction {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.roleLabel {
+  font-size: 0.8rem;
+  color: var(--tech-cyan);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.memberBtn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--gray-300);
+  width: 100%;
+}
+
+.memberBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.activeOperator {
+  background: rgba(0, 242, 255, 0.1) !important;
+  border-color: var(--tech-cyan) !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+}
+
+.memberInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gray-500);
+}
+
+.activeOperator .statusDot {
+  background: var(--tech-cyan);
+  box-shadow: 0 0 8px var(--tech-cyan);
+}
+
+.operatorBadge {
+  font-size: 0.6rem;
+  font-weight: 900;
+  background: var(--tech-cyan);
+  color: var(--gray-900);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.randomSubBtn {
+  margin-top: 15px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: 0.7;
+}
+
+.randomSubBtn:hover {
+  opacity: 1;
+  color: var(--tech-cyan);
+}
+
+.editBtn {
+  flex: 1;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-500);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.3s;
+  text-transform: uppercase;
+}
+
+.editBtn:hover {
+  border-color: var(--gray-300);
+  color: var(--gray-100);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.confirmBtn {
+  flex: 2; /* O botão de iniciar é maior e ganha mais destaque */
+  padding: 18px;
+  border-radius: 12px;
+  border: none;
+  background: var(--button-tech);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 242, 255, 0.2);
+  transition: 0.3s;
+  text-transform: uppercase;
+}
+
+.confirmBtn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .teamName {
+    font-size: 1.4rem;
+  }
+  .memberItem {
+    font-size: 1.1rem;
+  }
+  .buttonGroup {
+    flex-direction: column-reverse; /* No mobile o Iniciar fica em cima do Editar */
+    padding: 0 10px;
+  }
+
+  .confirmBtn,
+  .editBtn {
+    width: 100%;
+  }
+}

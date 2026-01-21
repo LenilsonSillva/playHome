@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { GameRouteState } from "../../GameLogistic/types";
 import "./votingPhase.css"; // Certifique-se de criar este arquivo
-import { PlayerAvatar } from "../PlayerAvatar/PlayerAvatar";
+import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
 
 type VotingProps = {
   data: GameRouteState["data"];

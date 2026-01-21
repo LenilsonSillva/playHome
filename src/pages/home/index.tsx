@@ -19,12 +19,12 @@ export default function Home() {
     },
     {
       id: "secret-word",
-      name: "Palavra Secreta",
+      name: "Criptografia",
       description:
         "Comunicação tática! Dê dicas precisas para sua equipe descriptografar a palavra.",
       minPlayers: 4,
       maxPlayers: 12,
-      route: "/games/secret-word/lobby",
+      route: "/games/secretWord/game",
       icon: "🔑",
       accent: "var(--tech-cyan)",
       btn: "var(--button-tech)",

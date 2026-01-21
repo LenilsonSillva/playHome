@@ -1,6 +1,6 @@
 import type { GlobalPlayer } from "../../../../types/player";
 import type { GameData, ImpostorPlayer } from "./types";
-import { WORDS, type WordData } from "./words";
+import { WORDS, type WordData } from "../../../../data/words";
 
 export function getImpostorCount(playersCount: number): number {
   if (playersCount >= 7) return 3;

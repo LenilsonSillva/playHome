@@ -4,7 +4,7 @@ import type {
   GameRouteState,
   ImpostorGameState,
 } from "../../GameLogistic/types";
-import { PlayerAvatar } from "../PlayerAvatar/PlayerAvatar";
+import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
 
 type DiscussPhaseProps = {
   data: GameRouteState["data"];

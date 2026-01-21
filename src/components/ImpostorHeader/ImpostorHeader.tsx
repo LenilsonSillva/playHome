@@ -18,7 +18,7 @@ export function ImpostorHeader({ mode, currentMode }: ChildProps) {
             PLAY<span>HOME</span>
           </h1>
         </a>
-        <div className={styles.systemBadge}>SISTEMA DE JOGOS</div>
+        <div className={styles.systemBadge}>PROTOCOLO IMPOSTOR</div>
       </header>
 
       <div className={styles.gameSection}>
