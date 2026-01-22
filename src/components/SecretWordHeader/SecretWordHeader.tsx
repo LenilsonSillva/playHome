@@ -1,5 +1,6 @@
 import styles from "./secretWordHeader.module.css";
 import "../../../src/styles/theme.css";
+import { useNavigate } from "react-router-dom";
 
 type ChildProps = {
   mode: (value: "blitz" | "duel") => void;
@@ -7,13 +8,14 @@ type ChildProps = {
 };
 
 export function SecretWordHeader({ mode, currentMode }: ChildProps) {
+  const navigate = useNavigate();
   return (
     <div className={styles.wrapper}>
       {/* Luz ambiente azul para combinar com o tema Tech/Ciano do jogo */}
       <div className={styles.ambientLight} />
 
       <header className={styles.topHeader}>
-        <a className={styles.logoLink} href="/">
+        <a className={styles.logoLink} onClick={() => navigate("/")}>
           <h1 className={styles.mainTitle}>
             PLAY<span>HOME</span>
           </h1>

@@ -1,5 +1,6 @@
 import styles from "./impostorHeader.module.css";
 import "../../styles/theme.css";
+import { useNavigate } from "react-router-dom";
 
 type ChildProps = {
   mode: (value: string) => void;
@@ -7,13 +8,14 @@ type ChildProps = {
 };
 
 export function ImpostorHeader({ mode, currentMode }: ChildProps) {
+  const navigate = useNavigate();
   return (
     <div className={styles.wrapper}>
       {/* Luz ambiente de fundo (opcional, para combinar com a home) */}
       <div className={styles.ambientLight} />
 
       <header className={styles.topHeader}>
-        <a className={styles.logoLink} href="/">
+        <a className={styles.logoLink} onClick={() => navigate("/")}>
           <h1 className={styles.mainTitle}>
             PLAY<span>HOME</span>
           </h1>

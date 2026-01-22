@@ -21,6 +21,7 @@ export function EliminationPhase({ data, onEliminate }: EliminationProps) {
       audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
       audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
     }
+    setTimeout(() => setFeedback("none"), 300);
   };
 
   const triggerFeedback = (type: "isImpostor") => {

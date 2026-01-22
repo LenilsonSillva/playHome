@@ -3,7 +3,7 @@ import type { SecretWordGameState } from "../GameLogistic/types";
 import styles from "./duelAction.module.css";
 import { usePlayers } from "../../../../contexts/contextHook";
 import successSfx from "../../../../assets/sounds/success.wav";
-import skipSfx from "../../../../assets/sounds/skip.ogg";
+import skipSfx from "../../../../assets/sounds/skip.mp3";
 import alertSfx from "../../../../assets/sounds/alert.wav";
 import endSfx from "../../../../assets/sounds/end.wav";
 
@@ -20,6 +20,8 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
   const [timerActive, setTimerActive] = useState(false);
   const [localTeamIdx, setLocalTeamIdx] = useState(data.currentTeamIdx);
   const [feedback, setFeedback] = useState<"none" | "success" | "fail">("none");
+  const [hasViewedWord, setHasViewedWord] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Refs para Áudio (evita recriação do objeto a cada render)
   const audioSuccess = useRef(new Audio(successSfx));
@@ -30,34 +32,46 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
   const currentTeam = data.teams[localTeamIdx];
   const currentOperator = players.find((p) => p.id === currentTeam.operatorId);
 
-  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
-      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
-    }
-  };
+  const playSound = useCallback(
+    (audioRef: React.RefObject<HTMLAudioElement>) => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+        audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+      }
+      setTimeout(() => setFeedback("none"), 300);
+    },
+    [],
+  );
 
-  // Função centralizadora de Feedback Sensorial
-  const triggerFeedback = (type: "success" | "fail") => {
-    setFeedback(type);
-    if (type === "success") {
-      playSound(audioSuccess); // Usa a função auxiliar
-      if ("vibrate" in navigator) navigator.vibrate(200);
-    } else {
-      playSound(audioSkip);
-      if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
-    }
-    setTimeout(() => setFeedback("none"), 300);
-  };
+  const triggerFeedback = useCallback(
+    (type: "success" | "fail") => {
+      setFeedback(type);
+      if (type === "success") {
+        playSound(audioSuccess);
+        if ("vibrate" in navigator) navigator.vibrate(200);
+      } else {
+        playSound(audioSkip);
+        if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
+      }
+      setTimeout(() => setFeedback("none"), 300);
+    },
+    [playSound],
+  );
 
   // Lógica de passar o turno
   const nextTurn = useCallback(() => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+
     triggerFeedback("fail");
     setLocalTeamIdx((prev) => (prev + 1) % data.teams.length);
     setSeconds(data.roundTime);
     setTimerActive(false);
     setIsRevealing(false);
-  }, [data.teams.length, data.roundTime, triggerFeedback]);
+    setHasViewedWord(false); // Reset visualização para o próximo time
+
+    setTimeout(() => setIsProcessing(false), 200);
+  }, [data.teams.length, data.roundTime, triggerFeedback, isProcessing]);
 
   // Efeito do Cronômetro
   useEffect(() => {
@@ -79,6 +93,8 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
   }, [timerActive, seconds, nextTurn]);
 
   const handleWin = () => {
+    if (isProcessing || !hasViewedWord) return;
+    setIsProcessing(true);
     triggerFeedback("success");
     // Pequeno delay para o jogador ver o feedback verde antes de mudar de tela/palavra
     setTimeout(() => {
@@ -123,7 +139,11 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
           ${feedback === "fail" ? styles.failFlash : ""}
         `}
         onContextMenu={(e) => e.preventDefault()}
-        onPointerDown={() => setIsRevealing(true)}
+        onPointerDown={() => {
+          setIsRevealing(true);
+          setHasViewedWord(true); // Marcou que viu
+          setIsRevealing(true);
+        }}
         onPointerUp={() => setIsRevealing(false)}
         onPointerLeave={() => setIsRevealing(false)}
       >
@@ -147,6 +167,7 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
             <button
               className={styles.startTimerBtn}
               onClick={() => setTimerActive(true)}
+              disabled={!hasViewedWord}
             >
               DICA DADA! INICIAR RESPOSTA ⏱️
             </button>
@@ -160,7 +181,11 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
             <button className={styles.failBtn} onClick={nextTurn}>
               ERROU / PASSAR ⏭️
             </button>
-            <button className={styles.winBtn} onClick={handleWin}>
+            <button
+              className={styles.winBtn}
+              onClick={handleWin}
+              disabled={!hasViewedWord || isProcessing}
+            >
               ACERTOU! 🏆
             </button>
           </div>

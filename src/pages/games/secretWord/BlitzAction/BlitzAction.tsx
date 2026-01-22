@@ -4,7 +4,7 @@ import { usePlayers } from "../../../../contexts/contextHook";
 import type { SecretWordGameState } from "../GameLogistic/types";
 import { getNewWord } from "../GameLogistic/gameLogistic";
 import successSfx from "../../../../assets/sounds/success.wav";
-import skipSfx from "../../../../assets/sounds/skip.ogg";
+import skipSfx from "../../../../assets/sounds/skip.mp3";
 import alertSfx from "../../../../assets/sounds/alert.wav";
 import endSfx from "../../../../assets/sounds/end.wav";
 
@@ -21,15 +21,13 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentScore, setCurrentScore] = useState(0);
   const [skipsLeft, setSkipsLeft] = useState(3);
+  const [hasViewedWord, setHasViewedWord] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // wordsUsedInRound: controla as palavras que já passaram (para não repetir no sorteio interno)
   const [wordsUsedInRound, setWordsUsedInRound] = useState<string[]>([
     data.currentWord!,
   ]);
-
-  // correctWords: armazena apenas as palavras que o time acertou de fato
   const [correctWords, setCorrectWords] = useState<string[]>([]);
-
   const [feedback, setFeedback] = useState<"none" | "success" | "skip">("none");
 
   const currentTeam = data.teams[data.currentTeamIdx];
@@ -40,44 +38,65 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
   const audioAlert = useRef(new Audio(alertSfx));
   const audioEnd = useRef(new Audio(endSfx));
 
-  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
-      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
-    }
-  };
+  const playSound = useCallback(
+    (audioRef: React.RefObject<HTMLAudioElement>) => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+        audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+      }
+      setTimeout(() => setFeedback("none"), 300);
+    },
+    [],
+  );
 
-  const triggerFeedback = (type: "success" | "skip") => {
-    setFeedback(type);
-    if (type === "success") {
-      playSound(audioSuccess); // Usa a função auxiliar
-      if ("vibrate" in navigator) navigator.vibrate(200);
-    } else {
-      playSound(audioSkip);
-      if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
-    }
-    setTimeout(() => setFeedback("none"), 300);
-  };
+  const triggerFeedback = useCallback(
+    (type: "success" | "skip") => {
+      setFeedback(type);
+      if (type === "success") {
+        playSound(audioSuccess);
+        if ("vibrate" in navigator) navigator.vibrate(200);
+      } else {
+        playSound(audioSkip);
+        if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
+      }
+      setTimeout(() => setFeedback("none"), 300);
+    },
+    [playSound],
+  );
 
+  // CRONÔMETRO BLINDADO: Único efeito que controla tempo e sons de alerta
   useEffect(() => {
-    if (!hasStarted || seconds < 0) return;
-    if (seconds === 10) audioAlert.current.play().catch(() => {});
-    if (seconds === 0) audioEnd.current.play().catch(() => {});
+    if (!hasStarted) return;
 
-    const timer = setInterval(() => setSeconds((s) => s - 1), 1000);
-    return () => clearInterval(timer);
-  }, [hasStarted, seconds]);
+    const timerId = setInterval(() => {
+      setSeconds((prev) => {
+        const nextValue = prev - 1;
+
+        // Dispara os sons baseando-se no novo valor de forma isolada
+        if (nextValue === 10) playSound(audioAlert);
+        if (nextValue === 0) {
+          playSound(audioEnd);
+          clearInterval(timerId);
+        }
+
+        return nextValue > 0 ? nextValue : 0;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [hasStarted, playSound]); // Só reinicia se o jogo começar. O clique no box não afeta mais este efeito.
 
   const handleNextWord = useCallback(
     (success: boolean) => {
+      if (isProcessing) return;
+      setIsProcessing(true);
+
       if (success) {
-        // Salva a palavra atual na lista de acertos antes de trocar
         setCorrectWords((prev) => [...prev, data.currentWord!]);
         setCurrentScore((prev) => prev + 1);
         triggerFeedback("success");
       }
 
-      // Sorteia a próxima considerando o histórico global + o desta rodada específica
       const nextWord = getNewWord(data.selectedCategories, [
         ...data.usedWords,
         ...wordsUsedInRound,
@@ -85,26 +104,39 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
 
       setWordsUsedInRound((prev) => [...prev, nextWord]);
       onUpdateGameState({ currentWord: nextWord });
+      setHasViewedWord(false);
       setIsRevealing(false);
+
+      // Delay curto para evitar spam de cliques
+      setTimeout(() => setIsProcessing(false), 200);
     },
-    [data, wordsUsedInRound, onUpdateGameState, triggerFeedback],
+    [data, wordsUsedInRound, onUpdateGameState, triggerFeedback, isProcessing],
   );
 
   const handleSkip = () => {
-    if (skipsLeft > 0) {
+    if (skipsLeft > 0 && !isProcessing) {
       setSkipsLeft((prev) => prev - 1);
       handleNextWord(false);
       triggerFeedback("skip");
     }
   };
 
+  // Finalização da Rodada
   useEffect(() => {
     if (seconds === 0 && hasStarted) {
-      // IMPORTANTE: Passamos 'correctWords' para o parâmetro 'wordsUsedInRound' do pai
-      // assim o relatório final exibe apenas o que foi acertado.
-      setTimeout(() => onFinishRound(currentScore, correctWords), 1000);
+      const timer = setTimeout(() => {
+        onFinishRound(currentScore, correctWords);
+      }, 1000);
+      return () => clearTimeout(timer);
     }
   }, [seconds, hasStarted, currentScore, correctWords, onFinishRound]);
+
+  // Função de toque otimizada para evitar re-renders repetitivos
+  const handlePointerDown = () => {
+    if (!hasStarted) setHasStarted(true);
+    if (!hasViewedWord) setHasViewedWord(true);
+    if (!isRevealing) setIsRevealing(true);
+  };
 
   return (
     <div className={styles.container}>
@@ -140,10 +172,7 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
           ${feedback === "skip" ? styles.skipFlash : ""}
         `}
         onContextMenu={(e) => e.preventDefault()}
-        onPointerDown={() => {
-          if (!hasStarted) setHasStarted(true);
-          setIsRevealing(true);
-        }}
+        onPointerDown={handlePointerDown}
         onPointerUp={() => setIsRevealing(false)}
         onPointerLeave={() => setIsRevealing(false)}
       >
@@ -177,14 +206,14 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
         <button
           className={styles.skipBtn}
           onClick={handleSkip}
-          disabled={skipsLeft === 0 || !hasStarted}
+          disabled={skipsLeft === 0 || !hasStarted || isProcessing}
         >
           PULAR
         </button>
         <button
           className={styles.correctBtn}
           onClick={() => handleNextWord(true)}
-          disabled={!hasStarted}
+          disabled={!hasStarted || !hasViewedWord || isProcessing}
         >
           ACERTOU! 🚀
         </button>

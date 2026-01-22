@@ -3,7 +3,7 @@ import type { GameRouteState } from "../../GameLogistic/types";
 import "./votingPhase.css"; // Certifique-se de criar este arquivo
 import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
 import impostorSd from "./../../../../../assets/sounds/impostor.mp3";
-import votingSd from "./../../../../../assets/sounds/skip.ogg";
+import votingSd from "./../../../../../assets/sounds/skip.mp3";
 
 type VotingProps = {
   data: GameRouteState["data"];
@@ -27,6 +27,7 @@ export function VotingPhase({ data, onEliminate }: VotingProps) {
       audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
       audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
     }
+    setTimeout(() => setFeedback("none"), 300);
   };
 
   const triggerFeedback = (type: "isImpostor") => {
