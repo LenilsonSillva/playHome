@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./discussPhase.module.css";
 import type {
   GameRouteState,
   ImpostorGameState,
 } from "../../GameLogistic/types";
 import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
+import startedSd from "./../../../../../assets/sounds/alert.wav";
 
 type DiscussPhaseProps = {
   data: GameRouteState["data"];
@@ -16,9 +17,31 @@ export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
   const aliveImpostorsCount = data.players.filter(
     (p) => p.isImpostor && p.isAlive,
   ).length;
+  const [, setFeedback] = useState<"none" | "started">("none");
+  const impostorSound = useRef(new Audio(startedSd));
+
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+    }
+  };
+
+  const triggerFeedback = (type: "started") => {
+    if (type === "started") {
+      playSound(impostorSound); // Usa a função auxiliar
+      if ("vibrate" in navigator) {
+        navigator.vibrate(200);
+      }
+      setTimeout(() => setFeedback("none"), 10);
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => setSeconds((p) => p + 1), 1000);
+    if (seconds === 0) {
+      triggerFeedback("started");
+    }
     return () => clearInterval(interval);
   }, []);
 

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { GameRouteState } from "../../GameLogistic/types";
 import "./eliminationPhase.css";
 import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
+import impostorSd from "./../../../../../assets/sounds/impostor.mp3";
 
 type EliminationProps = {
   data: GameRouteState["data"];
@@ -12,6 +13,25 @@ export function EliminationPhase({ data, onEliminate }: EliminationProps) {
   const alivePlayers = data.players.filter((p) => p.isAlive);
   const [eliminatedId, setEliminatedId] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
+  const [, setFeedback] = useState<"none" | "isImpostor">("none");
+  const impostorSound = useRef(new Audio(impostorSd));
+
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+    }
+  };
+
+  const triggerFeedback = (type: "isImpostor") => {
+    if (type === "isImpostor") {
+      playSound(impostorSound); // Usa a função auxiliar
+      if ("vibrate" in navigator) {
+        navigator.vibrate(200);
+      }
+      setTimeout(() => setFeedback("none"), 10);
+    }
+  };
 
   function handleEliminate(id: string | null) {
     setEliminatedId(id);
@@ -30,6 +50,9 @@ export function EliminationPhase({ data, onEliminate }: EliminationProps) {
 
   if (confirmed) {
     const eliminatedPlayer = alivePlayers.find((p) => p.id === eliminatedId);
+    if (eliminatedPlayer?.isImpostor) {
+      triggerFeedback("isImpostor");
+    }
     // Dados do card do player
     const playerRole = [
       "Engenheiro de Dobra",

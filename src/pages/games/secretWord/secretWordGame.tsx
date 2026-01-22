@@ -1,82 +1,89 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./index-secret.module.css";
 import type { SecretTeam, SecretWordGameState } from "./GameLogistic/types";
 import { SecretTeamReveal } from "./SecretTeamReveal/SecretTeamReveal";
 import { getNewWord } from "./GameLogistic/gameLogistic";
 import { BlitzAction } from "./BlitzAction/BlitzAction";
-import { DuelAction } from "./DualAction/DuelAction";
 import { ResultPhase } from "./ResultPhase/ResultPhase";
+import { DuelAction } from "./DualAction/DuelAction";
+import resultSd from "./../../../assets/sounds/win.mp3";
 
 export function SecretWordGame() {
   const location = useLocation();
   const navigate = useNavigate();
+  const resultSound = useRef(new Audio(resultSd));
 
-  // Inicializa o estado. Se não houver dados no location, o useEffect redirecionará.
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+    }
+  };
+
   const [gameState, setGameState] = useState<SecretWordGameState | null>(
     location.state?.data || null,
   );
 
-  // Redireciona se não houver dados (proteção contra F5)
   useEffect(() => {
     if (!gameState) {
       navigate("/games/secretWord/lobby");
     }
   }, [gameState, navigate]);
 
-  // FUNÇÃO: Atualiza os times (usada na tela de seleção de operadores)
   const updateTeams = (updatedTeams: SecretTeam[]) => {
     setGameState((prev) => (prev ? { ...prev, teams: updatedTeams } : null));
   };
 
-  // NOVA RODADA AO FIM DA ANTERIOR
+  const updateGameState = (newData: Partial<SecretWordGameState>) => {
+    setGameState((prev) => (prev ? { ...prev, ...newData } : null));
+  };
 
+  // --- LOGICA: PRÓXIMA RODADA (Botão no ResultPhase) ---
   const handleNextRound = () => {
     setGameState((prev) => {
       if (!prev) return null;
 
-      // 1. Sorteia a primeira palavra da nova rodada
       const firstWord = getNewWord(prev.selectedCategories, prev.usedWords);
 
-      // 2. Reseta os índices para começar do Time 1
       return {
         ...prev,
         currentTeamIdx: 0,
-        currentMatchIdx: 0, // Reseta contador do Duelo
+        currentMatchIdx: 0,
         currentWord: firstWord,
-        phase: "team-reveal", // Volta para a revelação para eles se organizarem
+        phase: "team-reveal",
+        // Reseta o roundScore (ganho da rodada) mas mantém o score total e wordsGuessed
         teams: prev.teams.map((t) => ({ ...t, roundScore: 0 })),
       };
     });
   };
 
-  // FUNÇÃO: Finaliza o turno de um time
-  const handleFinishRound = (teamScore: number, wordsUsedInRound: string[]) => {
+  // --- LOGICA: FINALIZAR TURNO BLITZ ---
+  const handleFinishRound = (teamScore: number, correctlyGuessed: string[]) => {
     setGameState((prev) => {
       if (!prev) return null;
 
-      // 1. Atualiza o score do time que acabou de jogar
+      // 1. Atualiza o time que acabou de jogar
       const updatedTeams = prev.teams.map((team, idx) => {
         if (idx === prev.currentTeamIdx) {
           return {
             ...team,
             score: team.score + teamScore,
-            roundScore: (team.roundScore || 0) + teamScore,
-            wordsGuessed: [...(team.wordsGuessed || []), ...wordsUsedInRound],
+            roundScore: teamScore, // O quanto ele fez agora
+            // Salva apenas as palavras que ele acertou de fato
+            wordsGuessed: [...(team.wordsGuessed || []), ...correctlyGuessed],
           };
         }
         return team;
       });
 
-      // 2. Adiciona as palavras usadas ao histórico global para não repetirem
-      const newUsedWords = [...prev.usedWords, ...wordsUsedInRound];
+      // 2. Alimenta o banco de palavras usadas (para não repetir nunca na sessão)
+      const newUsedWords = [...prev.usedWords, ...correctlyGuessed];
 
-      // 3. Verifica se todos os times já jogaram esta rodada
       const nextTeamIdx = prev.currentTeamIdx + 1;
       const isLastTeam = nextTeamIdx >= prev.teams.length;
 
       if (isLastTeam) {
-        // Se todos jogaram, vai para o pódio
         return {
           ...prev,
           teams: updatedTeams,
@@ -84,7 +91,7 @@ export function SecretWordGame() {
           phase: "result",
         };
       } else {
-        // Se ainda faltam times, sorteia nova palavra para o PRÓXIMO time e continua na ação
+        // Sorteia palavra para o próximo time
         const nextWord = getNewWord(prev.selectedCategories, newUsedWords);
         return {
           ...prev,
@@ -92,15 +99,10 @@ export function SecretWordGame() {
           usedWords: newUsedWords,
           currentTeamIdx: nextTeamIdx,
           currentWord: nextWord,
-          phase: "action", // Mantém na ação, o componente BlitzAction resetará os estados internos
+          phase: "action",
         };
       }
     });
-  };
-
-  // FUNÇÃO: Auxiliar para atualizar campos específicos do game de forma segura
-  const updateGameState = (newData: Partial<SecretWordGameState>) => {
-    setGameState((prev) => (prev ? { ...prev, ...newData } : null));
   };
 
   const renderPhase = () => {
@@ -113,26 +115,21 @@ export function SecretWordGame() {
             data={gameState}
             onUpdateTeams={updateTeams}
             onConfirm={() => {
-              // Ao confirmar times, sorteia a primeira palavra e vai direto para o jogo
               const firstWord = getNewWord(
                 gameState.selectedCategories,
                 gameState.usedWords,
               );
-              updateGameState({
-                currentWord: firstWord,
-                phase: "action",
-              });
+              updateGameState({ currentWord: firstWord, phase: "action" });
             }}
             onEdit={() => navigate("/games/secretWord/lobby")}
           />
         );
 
-      // Dentro do switch do renderPhase:
       case "action":
         if (gameState.mode === "blitz") {
           return (
             <BlitzAction
-              key={gameState.currentTeamIdx}
+              key={`blitz-${gameState.currentTeamIdx}`} // Reseta ao mudar de time
               data={gameState}
               onFinishRound={handleFinishRound}
               onUpdateGameState={updateGameState}
@@ -141,9 +138,7 @@ export function SecretWordGame() {
         } else {
           return (
             <DuelAction
-              // A KEY é essencial aqui! Quando mudamos a rodada (currentMatchIdx),
-              // o componente reseta o cronômetro e o estado interno.
-              key={`duel-round-${gameState.currentMatchIdx}`}
+              key={`duel-round-${gameState.currentMatchIdx}`} // Reseta ao mudar de palavra
               data={gameState}
               onReroll={() => {
                 const nextWord = getNewWord(
@@ -156,7 +151,7 @@ export function SecretWordGame() {
                 setGameState((prev) => {
                   if (!prev) return null;
 
-                  // 1. Soma ponto ao time vencedor
+                  // Atualiza o time vencedor do duelo
                   const updatedTeams = prev.teams.map((t, idx) =>
                     idx === winnerIdx
                       ? {
@@ -177,7 +172,6 @@ export function SecretWordGame() {
                   if (isGameOver) {
                     return { ...prev, teams: updatedTeams, phase: "result" };
                   } else {
-                    // 2. Sorteia próxima palavra para a próxima rodada do duelo
                     const nextWord = getNewWord(prev.selectedCategories, [
                       ...prev.usedWords,
                       ...wordsUsed,
@@ -188,8 +182,7 @@ export function SecretWordGame() {
                       usedWords: [...prev.usedWords, ...wordsUsed],
                       currentMatchIdx: nextMatchIdx,
                       currentWord: nextWord,
-                      currentTeamIdx: winnerIdx, // AQUI: Define que o vencedor começa a próxima
-                      // Mantém na fase 'action', a KEY acima cuidará do reset visual
+                      currentTeamIdx: winnerIdx, // Vencedor começa a próxima
                     };
                   }
                 });
@@ -199,10 +192,11 @@ export function SecretWordGame() {
         }
 
       case "result":
+        playSound(resultSound);
         return <ResultPhase data={gameState} onNextRound={handleNextRound} />;
 
       default:
-        return <div>Iniciando sistemas...</div>;
+        return <div>Carregando sistemas...</div>;
     }
   };
 

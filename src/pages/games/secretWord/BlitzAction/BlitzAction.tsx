@@ -3,14 +3,10 @@ import styles from "./blitzAction.module.css";
 import { usePlayers } from "../../../../contexts/contextHook";
 import type { SecretWordGameState } from "../GameLogistic/types";
 import { getNewWord } from "../GameLogistic/gameLogistic";
-
-// URLs de sons (Substitua pelos seus arquivos locais se preferir)
-const SOUNDS = {
-  success: "https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3",
-  skip: "https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3",
-  alert: "https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3",
-  end: "https://assets.mixkit.co/active_storage/sfx/941/941-preview.mp3",
-};
+import successSfx from "../../../../assets/sounds/success.wav";
+import skipSfx from "../../../../assets/sounds/skip.ogg";
+import alertSfx from "../../../../assets/sounds/alert.wav";
+import endSfx from "../../../../assets/sounds/end.wav";
 
 type Props = {
   data: SecretWordGameState;
@@ -25,44 +21,48 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentScore, setCurrentScore] = useState(0);
   const [skipsLeft, setSkipsLeft] = useState(3);
+
+  // wordsUsedInRound: controla as palavras que já passaram (para não repetir no sorteio interno)
   const [wordsUsedInRound, setWordsUsedInRound] = useState<string[]>([
     data.currentWord!,
   ]);
 
-  // Estado para controlar o flash visual (verde ou amarelo)
+  // correctWords: armazena apenas as palavras que o time acertou de fato
+  const [correctWords, setCorrectWords] = useState<string[]>([]);
+
   const [feedback, setFeedback] = useState<"none" | "success" | "skip">("none");
 
   const currentTeam = data.teams[data.currentTeamIdx];
   const operator = players.find((p) => p.id === currentTeam.operatorId);
 
-  // Refs de áudio para carregar apenas uma vez
-  const audioSuccess = useRef(new Audio(SOUNDS.success));
-  const audioSkip = useRef(new Audio(SOUNDS.skip));
-  const audioAlert = useRef(new Audio(SOUNDS.alert));
-  const audioEnd = useRef(new Audio(SOUNDS.end));
+  const audioSuccess = useRef(new Audio(successSfx));
+  const audioSkip = useRef(new Audio(skipSfx));
+  const audioAlert = useRef(new Audio(alertSfx));
+  const audioEnd = useRef(new Audio(endSfx));
 
-  // Função para Feedback Sensorial
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+    }
+  };
+
   const triggerFeedback = (type: "success" | "skip") => {
     setFeedback(type);
-
     if (type === "success") {
-      audioSuccess.current.play();
-      if ("vibrate" in navigator) navigator.vibrate(200); // Vibração curta
+      playSound(audioSuccess); // Usa a função auxiliar
+      if ("vibrate" in navigator) navigator.vibrate(200);
     } else {
-      audioSkip.current.play();
-      if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]); // Vibração dupla
+      playSound(audioSkip);
+      if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
     }
-
-    // Remove o flash visual após 300ms
     setTimeout(() => setFeedback("none"), 300);
   };
 
-  // Efeito do Cronômetro e Sons de Alerta
   useEffect(() => {
     if (!hasStarted || seconds < 0) return;
-
-    if (seconds === 10) audioAlert.current.play();
-    if (seconds === 0) audioEnd.current.play();
+    if (seconds === 10) audioAlert.current.play().catch(() => {});
+    if (seconds === 0) audioEnd.current.play().catch(() => {});
 
     const timer = setInterval(() => setSeconds((s) => s - 1), 1000);
     return () => clearInterval(timer);
@@ -71,45 +71,49 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
   const handleNextWord = useCallback(
     (success: boolean) => {
       if (success) {
+        // Salva a palavra atual na lista de acertos antes de trocar
+        setCorrectWords((prev) => [...prev, data.currentWord!]);
         setCurrentScore((prev) => prev + 1);
         triggerFeedback("success");
       }
 
+      // Sorteia a próxima considerando o histórico global + o desta rodada específica
       const nextWord = getNewWord(data.selectedCategories, [
         ...data.usedWords,
         ...wordsUsedInRound,
       ]);
+
       setWordsUsedInRound((prev) => [...prev, nextWord]);
       onUpdateGameState({ currentWord: nextWord });
       setIsRevealing(false);
     },
-    [data, wordsUsedInRound, onUpdateGameState],
+    [data, wordsUsedInRound, onUpdateGameState, triggerFeedback],
   );
 
   const handleSkip = () => {
     if (skipsLeft > 0) {
       setSkipsLeft((prev) => prev - 1);
-      triggerFeedback("skip");
       handleNextWord(false);
+      triggerFeedback("skip");
     }
   };
 
-  // Finalização da Rodada
   useEffect(() => {
     if (seconds === 0 && hasStarted) {
-      setTimeout(() => onFinishRound(currentScore, wordsUsedInRound), 1000);
+      // IMPORTANTE: Passamos 'correctWords' para o parâmetro 'wordsUsedInRound' do pai
+      // assim o relatório final exibe apenas o que foi acertado.
+      setTimeout(() => onFinishRound(currentScore, correctWords), 1000);
     }
-  }, [seconds, hasStarted]);
+  }, [seconds, hasStarted, currentScore, correctWords, onFinishRound]);
 
   return (
     <div className={styles.container}>
-      {/* ... Header e Timer (Igual anterior) ... */}
       <div className={styles.gameHeader}>
         <div className={styles.teamInfo}>
           <h2 className={styles.operatorName}>
             OPERADOR:{" "}
             <strong style={{ color: "white", fontSize: "1.5rem" }}>
-              {operator?.name}
+              {operator?.name || "---"}
             </strong>
           </h2>
           <span
@@ -127,7 +131,6 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
         </div>
       </div>
 
-      {/* ÁREA DA PALAVRA COM CLASSES DE FEEDBACK */}
       <div
         className={`
           ${styles.wordDisplay} 
@@ -159,7 +162,6 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
         )}
       </div>
 
-      {/* ... Stats e Ações (Igual anterior) ... */}
       <div className={styles.statsRow}>
         <div className={styles.statBox}>
           <label>ACERTOS</label>

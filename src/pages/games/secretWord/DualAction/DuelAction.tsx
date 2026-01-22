@@ -2,13 +2,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { SecretWordGameState } from "../GameLogistic/types";
 import styles from "./duelAction.module.css";
 import { usePlayers } from "../../../../contexts/contextHook";
-
-const SOUNDS = {
-  success: "https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3",
-  fail: "https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3",
-  alert: "https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3",
-  end: "https://assets.mixkit.co/active_storage/sfx/941/941-preview.mp3",
-};
+import successSfx from "../../../../assets/sounds/success.wav";
+import skipSfx from "../../../../assets/sounds/skip.ogg";
+import alertSfx from "../../../../assets/sounds/alert.wav";
+import endSfx from "../../../../assets/sounds/end.wav";
 
 type Props = {
   data: SecretWordGameState;
@@ -25,26 +22,33 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
   const [feedback, setFeedback] = useState<"none" | "success" | "fail">("none");
 
   // Refs para Áudio (evita recriação do objeto a cada render)
-  const audioSuccess = useRef(new Audio(SOUNDS.success));
-  const audioFail = useRef(new Audio(SOUNDS.fail));
-  const audioAlert = useRef(new Audio(SOUNDS.alert));
-  const audioEnd = useRef(new Audio(SOUNDS.end));
+  const audioSuccess = useRef(new Audio(successSfx));
+  const audioSkip = useRef(new Audio(skipSfx));
+  const audioAlert = useRef(new Audio(alertSfx));
+  const audioEnd = useRef(new Audio(endSfx));
 
   const currentTeam = data.teams[localTeamIdx];
   const currentOperator = players.find((p) => p.id === currentTeam.operatorId);
 
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+    }
+  };
+
   // Função centralizadora de Feedback Sensorial
-  const triggerFeedback = useCallback((type: "success" | "fail") => {
+  const triggerFeedback = (type: "success" | "fail") => {
     setFeedback(type);
     if (type === "success") {
-      audioSuccess.current.play().catch(() => {});
+      playSound(audioSuccess); // Usa a função auxiliar
       if ("vibrate" in navigator) navigator.vibrate(200);
     } else {
-      audioFail.current.play().catch(() => {});
-      if ("vibrate" in navigator) navigator.vibrate([100, 50]);
+      playSound(audioSkip);
+      if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
     }
     setTimeout(() => setFeedback("none"), 300);
-  }, []);
+  };
 
   // Lógica de passar o turno
   const nextTurn = useCallback(() => {

@@ -5,6 +5,9 @@ import type {
 } from "../../GameLogistic/types";
 import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
 import "./resultPhase.css";
+import winSd from "./../../../../../assets/sounds/win.mp3";
+import loseSd from "./../../../../../assets/sounds/end.wav";
+import { useEffect, useRef, useState } from "react";
 
 type DiscussPhaseProps = {
   data: GameRouteState["data"];
@@ -29,6 +32,37 @@ export function ResultPhase({
   // Impostores vencem se o número deles for >= ao da tripulação (Ex: 1x1, 2x2, 2x1)
   const impostorsWon = aliveImpostors >= aliveCrew && aliveImpostors > 0;
   const gameOver = crewWon || impostorsWon;
+
+  const [, setFeedback] = useState<"none" | "win" | "lose">("none");
+  const winSound = useRef(new Audio(winSd));
+  const loseSound = useRef(new Audio(loseSd));
+
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+    }
+  };
+
+  const triggerFeedback = (type: "win" | "lose") => {
+    if (type === "win") {
+      playSound(winSound); // Usa a função auxiliar
+      if ("vibrate" in navigator) navigator.vibrate(200);
+    } else {
+      playSound(loseSound);
+      if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
+    }
+    setTimeout(() => setFeedback("none"), 100);
+  };
+
+  (useEffect(() => {
+    if (crewWon) {
+      triggerFeedback("win");
+    } else {
+      triggerFeedback("lose");
+    }
+  }),
+    [crewWon]);
 
   // 3. Cálculo de Pontos (Mesma lógica do handleNextRound no pai)
   const getRoundPoints = (p: any) => {

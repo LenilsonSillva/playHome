@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { GameRouteState } from "../../GameLogistic/types";
 import "./votingPhase.css"; // Certifique-se de criar este arquivo
 import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvatar";
+import impostorSd from "./../../../../../assets/sounds/impostor.mp3";
+import votingSd from "./../../../../../assets/sounds/skip.ogg";
 
 type VotingProps = {
   data: GameRouteState["data"];
@@ -16,11 +18,32 @@ export function VotingPhase({ data, onEliminate }: VotingProps) {
   const currentVoter = alivePlayers[currentVoterIdx];
   const [seconds, setSeconds] = useState(60);
   const [finished, setFinished] = useState(false);
+  const [, setFeedback] = useState<"none" | "isImpostor">("none");
+  const impostorSound = useRef(new Audio(impostorSd));
+  const votingSound = useRef(new Audio(votingSd));
+
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
+      audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
+    }
+  };
+
+  const triggerFeedback = (type: "isImpostor") => {
+    if (type === "isImpostor") {
+      playSound(impostorSound); // Usa a função auxiliar
+      if ("vibrate" in navigator) {
+        navigator.vibrate(200);
+      }
+      setTimeout(() => setFeedback("none"), 10);
+    }
+  };
 
   useEffect(() => {
     if (finished) return;
     if (seconds === 0) {
       handleVote("NULO");
+      playSound(votingSound);
       return;
     }
     const interval = setInterval(() => setSeconds((s) => s - 1), 1000);
@@ -29,6 +52,7 @@ export function VotingPhase({ data, onEliminate }: VotingProps) {
 
   function handleVote(votedId: string) {
     setVotes((prev) => [...prev, { voter: currentVoter.id, voted: votedId }]);
+    playSound(votingSound);
     if (currentVoterIdx < alivePlayers.length - 1) {
       setCurrentVoterIdx(currentVoterIdx + 1);
       setSeconds(60);
@@ -57,6 +81,9 @@ export function VotingPhase({ data, onEliminate }: VotingProps) {
   if (finished) {
     const eliminatedId = getEliminatedPlayer();
     const eliminatedPlayer = alivePlayers.find((p) => p.id === eliminatedId);
+    if (eliminatedPlayer?.isImpostor) {
+      triggerFeedback("isImpostor");
+    }
     const voteCount: Record<string, number> = {};
     votes.forEach((v) => {
       if (v.voted !== "NULO")

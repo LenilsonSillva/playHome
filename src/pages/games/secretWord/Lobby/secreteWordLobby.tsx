@@ -146,15 +146,17 @@ export function SecretWordLobby() {
             </h3>
             <p className={styles.infoText}>
               {mode === "blitz"
-                ? "Um esquadrão por vez opera o sinal. O objetivo é adivinhar o máximo de palavras antes do tempo esgotar."
-                : "Todos os esquadrões interceptam o sinal simultaneamente. Uma dica por vez. Ganha quem acertar primeiro."}
+                ? "Um operador recebe uma palavra e os seus colegas de equipe tentam adivinha-la. Um esquadrão por vez, acerte o máximo de palavras antes do tempo acabar."
+                : "Os operadores dos esquadrões recebem a mesma palavra, cada um dá uma dica por vez, ganha quem acertar primeiro."}
             </p>
           </div>
         </div>
 
         {/* 2. FORMAÇÃO DE ESQUADRÕES (Apenas Opção) */}
         <div className={styles.section}>
-          <label className={styles.sectionLabel}>DISTRIBUIÇÃO DE JOGADOR</label>
+          <label className={styles.sectionLabel}>
+            DISTRIBUIÇÃO DOS JOGADORES
+          </label>
           <div className={styles.segmentedControl}>
             <button
               className={`${styles.segBtn} ${assignmentMode === "random" ? styles.segActive : ""}`}

@@ -22,8 +22,8 @@ export default function Home() {
       name: "Criptografia",
       description:
         "Comunicação tática! Dê dicas precisas para sua equipe descriptografar a palavra.",
-      minPlayers: 4,
-      maxPlayers: 12,
+      minPlayers: 2,
+      maxPlayers: 20,
       route: "/games/secretWord/game",
       icon: "🔑",
       accent: "var(--tech-cyan)",

@@ -33,7 +33,7 @@ export function SecretWordHeader({ mode, currentMode }: ChildProps) {
             className={`${styles.modeBtn} ${currentMode === "blitz" ? styles.active : ""}`}
             onClick={() => mode("blitz")}
           >
-            <span className={styles.btnIcon}>👨🏽‍👩🏻‍👧🏽‍👦🏻</span>
+            <span className={styles.btnIcon}>⚡</span>
             <span className={styles.btnText}>Infiltração</span>
           </button>
 
@@ -41,7 +41,7 @@ export function SecretWordHeader({ mode, currentMode }: ChildProps) {
             className={`${styles.modeBtn} ${currentMode === "duel" ? styles.active : ""}`}
             onClick={() => mode("duel")}
           >
-            <span className={styles.btnIcon}>👫🏻</span>
+            <span className={styles.btnIcon}>⚔️</span>
             <span className={styles.btnText}>INTERCEPTAÇÃO</span>
           </button>
 
