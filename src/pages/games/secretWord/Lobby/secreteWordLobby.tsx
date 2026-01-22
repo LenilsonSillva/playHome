@@ -22,8 +22,16 @@ export function SecretWordLobby() {
   const [selectedCats, setSelectedCats] = useState<string[]>([
     "Objetos",
     "Animais",
+    "Ciência",
+    "Natureza",
     "Comida",
+    "Emoções",
+    "Substantivos variados",
+    "Lugares",
+    "Países e Cidades",
+    "Tecnologia",
   ]);
+
   const [matchLimit, setMatchLimit] = useState(5); // Padrão 5
 
   // Mapeamento Manual: id do player -> index do time (0 a 9)

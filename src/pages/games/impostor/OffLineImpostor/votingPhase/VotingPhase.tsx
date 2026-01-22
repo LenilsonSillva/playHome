@@ -40,12 +40,23 @@ export function VotingPhase({ data, onEliminate }: VotingProps) {
   };
 
   useEffect(() => {
-    if (finished) return;
+    if (finished) {
+      const eliminatedId = getEliminatedPlayer();
+      const eliminatedPlayer = alivePlayers.find((p) => p.id === eliminatedId);
+
+      if (eliminatedPlayer?.isImpostor) {
+        triggerFeedback("isImpostor");
+      }
+
+      return;
+    }
+
     if (seconds === 0) {
       handleVote("NULO");
       playSound(votingSound);
       return;
     }
+
     const interval = setInterval(() => setSeconds((s) => s - 1), 1000);
     return () => clearInterval(interval);
   }, [seconds, finished]);
@@ -81,9 +92,7 @@ export function VotingPhase({ data, onEliminate }: VotingProps) {
   if (finished) {
     const eliminatedId = getEliminatedPlayer();
     const eliminatedPlayer = alivePlayers.find((p) => p.id === eliminatedId);
-    if (eliminatedPlayer?.isImpostor) {
-      triggerFeedback("isImpostor");
-    }
+
     const voteCount: Record<string, number> = {};
     votes.forEach((v) => {
       if (v.voted !== "NULO")
