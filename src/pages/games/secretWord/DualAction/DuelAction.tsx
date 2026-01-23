@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { SecretWordGameState } from "../GameLogistic/types";
 import styles from "./duelAction.module.css";
 import { usePlayers } from "../../../../contexts/contextHook";
@@ -6,6 +6,9 @@ import successSfx from "../../../../assets/sounds/success.wav";
 import skipSfx from "../../../../assets/sounds/skip.mp3";
 import alertSfx from "../../../../assets/sounds/alert.wav";
 import endSfx from "../../../../assets/sounds/end.wav";
+import silentWav from "../../../../assets/sounds/silent.wav";
+import { WordRevealBox } from "../components/WordRevealBox";
+import { useIOSAudioUnlock } from "../../../../hooks/useIOSAudioUnlock";
 
 type Props = {
   data: SecretWordGameState;
@@ -19,40 +22,33 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
   const [isRevealing, setIsRevealing] = useState(false);
   const [timerActive, setTimerActive] = useState(false);
   const [localTeamIdx, setLocalTeamIdx] = useState(data.currentTeamIdx);
-  const [feedback, setFeedback] = useState<"none" | "success" | "fail">("none");
+  const [feedback, setFeedback] = useState<"none" | "success" | "skip">("none");
   const [hasViewedWord, setHasViewedWord] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Refs para Áudio (evita recriação do objeto a cada render)
-  const audioSuccess = useRef(new Audio(successSfx));
-  const audioSkip = useRef(new Audio(skipSfx));
-  const audioAlert = useRef(new Audio(alertSfx));
-  const audioEnd = useRef(new Audio(endSfx));
-
   const currentTeam = data.teams[localTeamIdx];
   const currentOperator = players.find((p) => p.id === currentTeam.operatorId);
-
-  const playSound = useCallback(
-    (audioRef: React.RefObject<HTMLAudioElement>) => {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
-        audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
-      }
-      setTimeout(() => setFeedback("none"), 300);
+  const { initAudio, playSound } = useIOSAudioUnlock(
+    {
+      success: successSfx,
+      skip: skipSfx,
+      alert: alertSfx,
+      end: endSfx,
     },
-    [],
+    silentWav,
   );
 
   const triggerFeedback = useCallback(
-    (type: "success" | "fail") => {
+    (type: "success" | "skip") => {
       setFeedback(type);
+
       if (type === "success") {
-        playSound(audioSuccess);
+        playSound("success");
         if ("vibrate" in navigator) navigator.vibrate(200);
       } else {
-        playSound(audioSkip);
+        playSound("skip");
         if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
       }
+
       setTimeout(() => setFeedback("none"), 300);
     },
     [playSound],
@@ -63,12 +59,11 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
     if (isProcessing) return;
     setIsProcessing(true);
 
-    triggerFeedback("fail");
+    triggerFeedback("skip");
     setLocalTeamIdx((prev) => (prev + 1) % data.teams.length);
     setSeconds(data.roundTime);
     setTimerActive(false);
-    setIsRevealing(false);
-    setHasViewedWord(false); // Reset visualização para o próximo time
+    setIsRevealing(false); // Reset visualização para o próximo time
 
     setTimeout(() => setIsProcessing(false), 200);
   }, [data.teams.length, data.roundTime, triggerFeedback, isProcessing]);
@@ -77,10 +72,10 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
   useEffect(() => {
     if (!timerActive || seconds < 0) return;
 
-    if (seconds === 3) audioAlert.current.play().catch(() => {});
+    if (seconds === 3) playSound("alert");
 
     if (seconds === 0) {
-      audioEnd.current.play().catch(() => {});
+      playSound("end");
       nextTurn();
       return;
     }
@@ -100,6 +95,22 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
     setTimeout(() => {
       onFinishMatch(localTeamIdx, [data.currentWord!]);
     }, 400);
+  };
+
+  const handlePointerDown = useCallback(() => {
+    initAudio(); // 🔥 desbloqueia áudio no iOS
+
+    if (!hasViewedWord) setHasViewedWord(true);
+    if (!isRevealing) setIsRevealing(true);
+  }, [hasViewedWord, isRevealing, initAudio]);
+
+  const handlePointerUp = useCallback(() => {
+    setIsRevealing(false);
+  }, []);
+
+  const allowRerollBtn = () => {
+    setHasViewedWord(false);
+    return onReroll();
   };
 
   return (
@@ -131,34 +142,15 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
       </div>
 
       {/* ÁREA DE CONSULTA (SEGURAR PARA VER) */}
-      <div
-        className={`
-          ${styles.wordDisplay} 
-          ${isRevealing ? styles.active : ""} 
-          ${feedback === "success" ? styles.successFlash : ""} 
-          ${feedback === "fail" ? styles.failFlash : ""}
-        `}
-        onContextMenu={(e) => e.preventDefault()}
-        onPointerDown={() => {
-          setIsRevealing(true);
-          setHasViewedWord(true); // Marcou que viu
-          setIsRevealing(true);
-        }}
-        onPointerUp={() => setIsRevealing(false)}
-        onPointerLeave={() => setIsRevealing(false)}
-      >
-        {!isRevealing ? (
-          <div className={styles.hiddenContent}>
-            <div className={styles.pressIcon}>{timerActive ? "👆" : "📡"}</div>
-            <p>SEGURE PARA VER A PALAVRA</p>
-          </div>
-        ) : (
-          <div className={styles.revealedContent}>
-            <span className={styles.label}>TRANSMISSÃO PRIVADA:</span>
-            <h1 className={styles.word}>{data.currentWord}</h1>
-          </div>
-        )}
-      </div>
+
+      <WordRevealBox
+        word={data.currentWord}
+        feedback={feedback}
+        isRevealing={isRevealing}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        hasStarted={hasViewedWord}
+      />
 
       {/* CONTROLES DE FLUXO */}
       <div className={styles.actionsWrapper}>
@@ -172,7 +164,7 @@ export function DuelAction({ data, onFinishMatch, onReroll }: Props) {
               DICA DADA! INICIAR RESPOSTA ⏱️
             </button>
             {/* NOVO BOTÃO DE TROCAR PALAVRA */}
-            <button className={styles.rerollBtn} onClick={onReroll}>
+            <button className={styles.rerollBtn} onClick={allowRerollBtn}>
               🔄 TROCAR PALAVRA
             </button>
           </div>

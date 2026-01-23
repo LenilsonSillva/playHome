@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styles from "./blitzAction.module.css";
 import { usePlayers } from "../../../../contexts/contextHook";
 import type { SecretWordGameState } from "../GameLogistic/types";
@@ -7,6 +7,9 @@ import successSfx from "../../../../assets/sounds/success.wav";
 import skipSfx from "../../../../assets/sounds/skip.mp3";
 import alertSfx from "../../../../assets/sounds/alert.wav";
 import endSfx from "../../../../assets/sounds/end.wav";
+import silentWav from "../../../../assets/sounds/silent.wav";
+import { WordRevealBox } from "../components/WordRevealBox";
+import { useIOSAudioUnlock } from "../../../../hooks/useIOSAudioUnlock";
 
 type Props = {
   data: SecretWordGameState;
@@ -23,42 +26,35 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
   const [skipsLeft, setSkipsLeft] = useState(3);
   const [hasViewedWord, setHasViewedWord] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-
   const [wordsUsedInRound, setWordsUsedInRound] = useState<string[]>([
     data.currentWord!,
   ]);
   const [correctWords, setCorrectWords] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<"none" | "success" | "skip">("none");
-
   const currentTeam = data.teams[data.currentTeamIdx];
   const operator = players.find((p) => p.id === currentTeam.operatorId);
-
-  const audioSuccess = useRef(new Audio(successSfx));
-  const audioSkip = useRef(new Audio(skipSfx));
-  const audioAlert = useRef(new Audio(alertSfx));
-  const audioEnd = useRef(new Audio(endSfx));
-
-  const playSound = useCallback(
-    (audioRef: React.RefObject<HTMLAudioElement>) => {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0; // Reinicia o áudio se ele já estiver tocando
-        audioRef.current.play().catch(() => {}); // Evita erro de interação do navegador
-      }
-      setTimeout(() => setFeedback("none"), 300);
+  const { initAudio, playSound } = useIOSAudioUnlock(
+    {
+      success: successSfx,
+      skip: skipSfx,
+      alert: alertSfx,
+      end: endSfx,
     },
-    [],
+    silentWav,
   );
 
   const triggerFeedback = useCallback(
     (type: "success" | "skip") => {
       setFeedback(type);
+
       if (type === "success") {
-        playSound(audioSuccess);
+        playSound("success");
         if ("vibrate" in navigator) navigator.vibrate(200);
       } else {
-        playSound(audioSkip);
+        playSound("skip");
         if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
       }
+
       setTimeout(() => setFeedback("none"), 300);
     },
     [playSound],
@@ -72,10 +68,9 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
       setSeconds((prev) => {
         const nextValue = prev - 1;
 
-        // Dispara os sons baseando-se no novo valor de forma isolada
-        if (nextValue === 10) playSound(audioAlert);
+        if (nextValue === 10) playSound("alert");
         if (nextValue === 0) {
-          playSound(audioEnd);
+          playSound("end");
           clearInterval(timerId);
         }
 
@@ -132,11 +127,17 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
   }, [seconds, hasStarted, currentScore, correctWords, onFinishRound]);
 
   // Função de toque otimizada para evitar re-renders repetitivos
-  const handlePointerDown = () => {
+  const handlePointerDown = useCallback(() => {
+    initAudio(); // 🔥 desbloqueia áudio no iOS
+
     if (!hasStarted) setHasStarted(true);
     if (!hasViewedWord) setHasViewedWord(true);
     if (!isRevealing) setIsRevealing(true);
-  };
+  }, [hasStarted, hasViewedWord, isRevealing, initAudio]);
+
+  const handlePointerUp = useCallback(() => {
+    setIsRevealing(false);
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -163,33 +164,14 @@ export function BlitzAction({ data, onFinishRound, onUpdateGameState }: Props) {
         </div>
       </div>
 
-      <div
-        className={`
-          ${styles.wordDisplay} 
-          ${isRevealing ? styles.active : ""} 
-          ${!hasStarted ? styles.waiting : ""}
-          ${feedback === "success" ? styles.successFlash : ""}
-          ${feedback === "skip" ? styles.skipFlash : ""}
-        `}
-        onContextMenu={(e) => e.preventDefault()}
+      <WordRevealBox
+        word={data.currentWord}
+        hasStarted={hasStarted}
+        isRevealing={isRevealing}
+        feedback={feedback}
         onPointerDown={handlePointerDown}
-        onPointerUp={() => setIsRevealing(false)}
-        onPointerLeave={() => setIsRevealing(false)}
-      >
-        {!isRevealing ? (
-          <div className={styles.hiddenContent}>
-            <div className={styles.pressIcon}>{hasStarted ? "👆" : "📡"}</div>
-            <p>
-              {hasStarted ? "PRESSIONE PARA VER" : "PRESSIONE PARA INICIAR"}
-            </p>
-          </div>
-        ) : (
-          <div className={styles.revealedContent}>
-            <span className={styles.label}>TRANSMISSÃO ATIVA:</span>
-            <h1 className={styles.word}>{data.currentWord}</h1>
-          </div>
-        )}
-      </div>
+        onPointerUp={handlePointerUp}
+      />
 
       <div className={styles.statsRow}>
         <div className={styles.statBox}>
