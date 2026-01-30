@@ -13,12 +13,14 @@ type DiscussPhaseProps = {
   data: GameRouteState["data"];
   onNextPhase: (phase: ImpostorGameState["phase"]) => void;
   onNextRound?: () => void;
+  isOnline?: boolean;
 };
 
 export function ResultPhase({
   data,
   onNextPhase,
   onNextRound,
+  isOnline,
 }: DiscussPhaseProps) {
   const navigate = useNavigate();
 
@@ -76,7 +78,9 @@ export function ResultPhase({
     .map((p) => ({
       ...p,
       roundPoints: getRoundPoints(p),
-      totalScore: (p.score || 0) + getRoundPoints(p),
+      totalScore: isOnline
+        ? (p.globalScore ?? 0)
+        : (p.score || 0) + getRoundPoints(p),
     }))
     .sort((a, b) => b.totalScore - a.totalScore); // Do maior para o menor
 

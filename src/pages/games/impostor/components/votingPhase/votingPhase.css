@@ -297,3 +297,143 @@
   background: var(--success);
   box-shadow: 0 0 8px var(--success);
 }
+
+.waitscreen-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.wait-panel {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wait-avatar-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.wait-main-text {
+  color: var(--tech-cyan);
+  font-weight: bold;
+  font-size: 1.3rem;
+  margin-top: 15px;
+}
+
+.wait-sub-text {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-top: 5px;
+}
+
+/* LISTA DE PROGRESSO */
+.voting-progress-list {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+  text-align: left;
+  width: 100%;
+}
+
+.progress-title {
+  font-size: 1rem;
+  color: var(--gray-400);
+  letter-spacing: 3px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.progress-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.progress-item {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.progress-item.voted {
+  border-color: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.progress-item.pending {
+  opacity: 0.6;
+}
+
+.status-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 15px;
+  background: var(--gray-600);
+}
+
+.voted .status-led {
+  background: var(--success);
+  box-shadow: 0 0 10px var(--success);
+}
+
+.pending .status-led {
+  background: var(--caution-amber);
+  animation: blink-led 1s infinite alternate;
+}
+
+.progress-item .p-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--gray-200);
+}
+
+.progress-item .p-status {
+  font-size: 1.2rem;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.voted .p-status {
+  color: var(--success);
+}
+
+.pending .p-status {
+  color: var(--caution-amber);
+}
+
+@keyframes blink-led {
+  from {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  to {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+}
+
+/* Custom Scrollbar para a lista */
+.progress-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.progress-grid::-webkit-scrollbar-thumb {
+  background: var(--gray-700);
+  border-radius: 10px;
+}

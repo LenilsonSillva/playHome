@@ -8,14 +8,20 @@ import { PlayerAvatar } from "../../../../../components/PlayerAvatar/PlayerAvata
 import startedSd from "./../../../../../assets/sounds/alert.wav";
 
 type DiscussPhaseProps = {
-  data: GameRouteState["data"];
+  data: GameRouteState["data"] | any;
   onNextPhase: (phase: ImpostorGameState["phase"]) => void;
+  isOnline?: boolean;
 };
 
-export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
+export function DiscussPhase({
+  data,
+  onNextPhase,
+  isOnline,
+}: DiscussPhaseProps) {
   const [seconds, setSeconds] = useState(0);
-  const aliveImpostorsCount = data.players.filter(
-    (p) => p.isImpostor && p.isAlive,
+  const players = Array.isArray(data.players) ? data.players : [];
+  const aliveImpostorsCount = players.filter(
+    (p: any) => p.isImpostor && p.isAlive,
   ).length;
   const [, setFeedback] = useState<"none" | "started">("none");
   const impostorSound = useRef(new Audio(startedSd));
@@ -47,9 +53,8 @@ export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
   }, []);
 
   // ORDENAÇÃO: Filtramos os vivos e ordenamos pelo score decrescente
-  const sortedPlayers = [...data.players]
+  const sortedPlayers = [...players]
     .filter((p) => p.isAlive)
-    // Ordena por globalScore (que agora contém o total até a rodada passada)
     .sort((a, b) => (b.globalScore ?? 0) - (a.globalScore ?? 0));
 
   function formatTime(totalSeconds: number) {
@@ -110,18 +115,27 @@ export function DiscussPhase({ data, onNextPhase }: DiscussPhaseProps) {
         </div>
 
         <div className={styles.buttonGroup}>
-          <button
-            className={`${styles.actionBtn} ${styles.votingBtn}`}
-            onClick={() => onNextPhase("voting")}
-          >
-            VOTAR
-          </button>
-          <button
-            className={`${styles.actionBtn} ${styles.skipBtn}`}
-            onClick={() => onNextPhase("elimination")}
-          >
-            PULAR VOTAÇÃO
-          </button>
+          {!isOnline || (isOnline && data.isHost) ? (
+            <button
+              className={`${styles.actionBtn} ${styles.votingBtn}`}
+              onClick={() => onNextPhase("voting")}
+            >
+              VOTAR
+            </button>
+          ) : (
+            <div className={styles.waitHost}>
+              ⏳ Aguarde o host iniciar a votação...
+            </div>
+          )}
+
+          {!isOnline && (
+            <button
+              className={`${styles.actionBtn} ${styles.skipBtn}`}
+              onClick={() => onNextPhase("elimination")}
+            >
+              PULAR VOTAÇÃO
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,15 +1,15 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { RevealPhase } from "./revealPhase";
-import { DiscussPhase } from "./discussPhase";
+import { RevealPhase } from "../components/revealPhase";
+import { DiscussPhase } from "../components/discussPhase";
 import type {
   GameRouteState,
   ImpostorGameState,
   ImpostorPlayer,
 } from "../GameLogistic/types";
-import { VotingPhase } from "./votingPhase/VotingPhase";
-import { EliminationPhase } from "./votingPhase/EliminationPhase";
+import { VotingPhase } from "../components/votingPhase/VotingPhase";
+import { EliminationPhase } from "../components/votingPhase/EliminationPhase";
 import { useState, useRef, useEffect } from "react";
-import { ResultPhase } from "./resultPhase";
+import { ResultPhase } from "../components/resultPhase";
 import { initializeGame } from "../GameLogistic/gameLogistic";
 import { usePlayers } from "../../../../contexts/contextHook";
 
@@ -259,6 +259,7 @@ export function OfflineImpostorGame() {
           data={gameState.data}
           onNextPhase={changePhase}
           onExit={goBackLobby}
+          isOnline={false}
           onReroll={handleReroll}
         />
       );
@@ -269,6 +270,7 @@ export function OfflineImpostorGame() {
         <VotingPhase
           data={gameState.data}
           onEliminate={handlePlayerElimination}
+          isOnline={false}
         />
       );
     case "elimination":

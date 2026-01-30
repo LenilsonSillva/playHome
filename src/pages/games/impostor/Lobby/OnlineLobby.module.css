@@ -1,224 +1,396 @@
-.pageWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  padding: 20px;
-}
-
-/* .ambientLight {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 80vw;
-  background: radial-gradient(
-    circle,
-    rgba(59, 130, 246, 0.1) 0%,
-    transparent 70%
-  );
-  filter: blur(100px);
-  z-index: 0;
-} */
-
-.container {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 550px;
-}
-
-.statusCard {
-  padding: 3rem;
-  text-align: center;
+.lobbyWrapper {
+  width: 95%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background: rgba(15, 23, 42, 0.83);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 242, 255, 0.2);
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  border: 1px solid rgba(0, 242, 255, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
-/* --- ÍCONE DE SINAL ANIMADO --- */
-.header {
+.headerArea {
+  text-align: center;
+  border-bottom: 1px solid var(--gray-700);
+  padding-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 2.2rem;
+  color: var(--tech-cyan);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin: 0;
+  text-shadow: 0 0 15px var(--tech-glow);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 5px;
+  letter-spacing: 1px;
+}
+
+.section {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 1rem;
 }
 
-.signalIcon {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2.5rem;
-}
-
-.lockIcon {
-  z-index: 2;
-  filter: drop-shadow(0 0 10px var(--tech-cyan));
-}
-
-.wave {
-  position: absolute;
-  border: 2px solid var(--tech-cyan);
-  border-radius: 50%;
-  animation: ripple 2s infinite;
-  opacity: 0;
-}
-
-.wave:nth-child(1) {
-  width: 40px;
-  height: 40px;
-  animation-delay: 0s;
-}
-.wave:nth-child(2) {
-  width: 60px;
-  height: 60px;
-  animation-delay: 0.5s;
-}
-.wave:nth-child(3) {
-  width: 80px;
-  height: 80px;
-  animation-delay: 1s;
-}
-
-@keyframes ripple {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-.badge {
-  font-size: 0.7rem;
-  letter-spacing: 3px;
-  color: var(--tech-cyan);
-  background: rgba(0, 242, 255, 0.1);
-  padding: 4px 12px;
-  border-radius: 4px;
-}
-
-/* --- TEXTOS --- */
-.title {
-  font-size: 2.5rem;
-  font-weight: 900;
+.sectionTitle {
+  font-size: 1.4rem;
+  color: var(--gray-300);
+  letter-spacing: 1px;
   margin: 0;
-  letter-spacing: -1px;
 }
 
-.title span {
-  color: transparent;
-  -webkit-text-stroke: 1px var(--gray-300);
+/* --- INPUTS --- */
+.inputGroup {
+  display: flex;
+  gap: 12px;
 }
 
-.statusLine {
+.textInput {
+  flex: 1;
+  background: var(--gray-900);
+  border: 1px solid var(--gray-600);
+  padding: 15px 20px;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.2rem;
+  transition: border-color 0.3s;
+}
+
+.textInput:focus {
+  border-color: var(--tech-cyan);
+  outline: none;
+  box-shadow: 0 0 10px var(--tech-glow);
+}
+
+.removeBtn {
+  /* Reset de estilos */
+  appearance: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+
+  /* Dimensões e Forma */
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+
+  /* Cores (Baseadas no seu Danger Neon) */
+  background: rgba(255, 0, 60, 0.1);
+  border: 1px solid rgba(255, 0, 60, 0.3);
+  color: var(--danger-neon);
+
+  /* Centralização PERFEITA do X */
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
+
+  /* Tipografia */
+  font-size: 18px; /* Ajuste conforme o gosto */
+  font-weight: bold;
+  line-height: 0; /* Truque para não empurrar o texto para baixo */
+
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0; /* Impede que o botão seja esmagado se o nome for longo */
 }
 
-.dot {
+.removeBtn:hover {
+  background: var(--danger-neon);
+  color: white;
+  border-color: white;
+  /* Efeito de rotação moderno */
+  transform: rotate(90deg);
+  box-shadow: 0 0 12px var(--danger-glow);
+}
+
+.removeBtn:active {
+  transform: scale(0.9) rotate(90deg);
+}
+
+.addButton {
+  border-radius: 12px;
+  border: 1px solid var(--plasma-blue);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--tech-cyan);
+  padding: 0 25px;
+  border-radius: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: 0.2s;
+}
+
+.addButton:hover {
+  transform: scale(1.02);
+  filter: brightness(1.2);
+}
+
+/* --- LISTA DE JOGADORES --- */
+.playersList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.playerTag {
+  background: var(--gray-800);
+  padding: 10px 15px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideIn 0.3s ease-out;
+}
+
+.pName {
+  font-size: 1.3rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dotIndicator {
   width: 8px;
   height: 8px;
-  background: var(--caution-amber);
+  background: var(--tech-cyan);
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--caution-amber);
-  animation: blink 1s infinite alternate;
+  margin-right: 10px;
+  box-shadow: 0 0 8px var(--tech-cyan);
 }
 
-@keyframes blink {
+/* --- COUNTER --- */
+.counterRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 15px 20px;
+  border-radius: 15px;
+}
+
+.counterControls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.countBtn {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-500);
+  background: var(--gray-700);
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.countDisplay {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--tech-cyan);
+  min-width: 30px;
+  text-align: center;
+}
+
+/* --- GRID SETTINGS (SWITCHES) --- */
+.gridSettings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.checkboxLabel {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 18px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.checkText {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* --- SWITCH STYLE --- */
+.switchWrapper {
+  position: relative;
+  width: 55px;
+  height: 30px;
+}
+
+.checkboxInput {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switchSlider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--gray-700);
+  transition: 0.4s;
+  border-radius: 34px;
+  border: 1px solid var(--gray-500);
+}
+
+.switchSlider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.checkboxInput:checked + .switchSlider {
+  background-color: var(--tech-cyan);
+  box-shadow: 0 0 15px var(--plasma-glow);
+}
+
+.checkboxInput:checked + .switchSlider:before {
+  transform: translateX(24px);
+}
+
+/* --- CATEGORIAS --- */
+.categoryToggle {
+  width: 100%;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid var(--plasma-blue);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--tech-cyan);
+  font-weight: 800;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.categoryToggle:hover {
+  transform: scale(1.02);
+  filter: brightness(1.2);
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.categoryItem {
+  cursor: pointer;
+}
+
+.categoryBox {
+  display: block;
+  padding: 10px;
+  text-align: center;
+  background: var(--gray-800);
+  border: 1px solid var(--gray-600);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.checkboxInput:checked + .categoryBox {
+  background: var(--tech-cyan);
+  color: var(--gray-900);
+  font-weight: bold;
+  border-color: white;
+}
+
+/* --- BOTÃO INICIAR --- */
+.startButton {
+  padding: 25px;
+  border-radius: 15px;
+  border: none;
+  background: var(--button-red);
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255, 0, 60, 0.3);
+  transition: transform 0.2s;
+}
+
+.startButton:hover:not(:disabled) {
+  transform: scale(1.02);
+  filter: brightness(1.2);
+}
+
+.startButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--gray-600);
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 600px) {
+  .lobbyWrapper {
+    padding: 1.5rem;
+    width: 98%;
+    backdrop-filter: none !important; /* Remove o blur que trava o teclado */
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .inputGroup {
+    flex-direction: column;
+  }
+
+  .addButton {
+    padding: 15px;
+  }
+
+  .gridSettings {
+    grid-template-columns: 1fr;
+  }
+
+  .checkText {
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes slideIn {
   from {
-    opacity: 0.3;
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-  }
-}
-
-.statusText {
-  color: var(--caution-amber);
-  font-weight: 800;
-  font-size: 0.85rem;
-  margin: 0;
-}
-
-.description {
-  color: var(--text-muted);
-  font-size: 1rem;
-  line-height: 1.6;
-  margin-top: 1.5rem;
-}
-
-/* --- BARRA DE PROGRESSO FAKE --- */
-.progressBox {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.progressBar {
-  width: 100%;
-  height: 6px;
-  background: var(--gray-800);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progressFill {
-  width: 65%;
-  height: 100%;
-  background: var(--button-tech);
-  box-shadow: 0 0 15px var(--plasma-glow);
-  position: relative;
-}
-
-.percentage {
-  font-size: 0.65rem;
-  font-family: monospace;
-  color: var(--gray-500);
-  letter-spacing: 1px;
-}
-
-/* --- BOTÃO --- */
-.backButton {
-  background: transparent;
-  border: 1px solid var(--gray-600);
-  color: var(--text-default);
-  padding: 15px;
-  border-radius: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-}
-
-.backButton:hover {
-  border-color: var(--tech-cyan);
-  color: var(--tech-cyan);
-  background: rgba(0, 242, 255, 0.05);
-  transform: translateY(-2px);
-}
-
-@media (max-width: 480px) {
-  .statusCard {
-    padding: 2rem 1.5rem;
-  }
-  .title {
-    font-size: 2rem;
+    transform: translateY(0);
   }
 }
