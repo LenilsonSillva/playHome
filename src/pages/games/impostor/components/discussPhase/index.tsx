@@ -149,7 +149,7 @@ export function DiscussPhase({
             </button>
           ) : (
             <div className={styles.waitHost}>
-              ⏳ Aguarde o host iniciar a votação...
+              ⏳ Aguarde o líder iniciar a votação...
             </div>
           )}
 

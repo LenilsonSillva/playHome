@@ -342,7 +342,7 @@ export function VotingPhase({ data, onEliminate, isOnline }: VotingProps) {
               onClick={handleResult}
               disabled={isOnline && !data.isHost}
             >
-              {isOnline && !data.isHost ? "AGUARDANDO HOST..." : "PROSSEGUIR"}
+              {isOnline && !data.isHost ? "AGUARDANDO LÍDER..." : "PROSSEGUIR"}
             </button>
           </div>
         </div>

@@ -25,14 +25,6 @@ export function OnlineImpostorGame() {
   useEffect(() => {
     function onGameUpdate(data: any) {
       setGameData((prev: any) => {
-        console.log(
-          "[game-update] incoming data:",
-          data,
-          "socketId:",
-          socket.id,
-          "prev:",
-          prev,
-        );
         if (!data) return data;
         const isHostFromServer =
           typeof data.isHost === "boolean"
@@ -61,9 +53,6 @@ export function OnlineImpostorGame() {
     }
 
     function onHostChanged({ newHostId }: { newHostId: string }) {
-      console.log("Host changed event received. New hostId:", newHostId);
-      console.log("My socket id:", socket.id);
-
       const isNowHost = socket.id === newHostId;
 
       setGameData((prev: any) => {
@@ -78,7 +67,7 @@ export function OnlineImpostorGame() {
       // Mostra aviso se o jogador se tornou host
       if (isNowHost) {
         setShowNewHostAlert(true);
-        setTimeout(() => setShowNewHostAlert(false), 40000); // desaparece após 4s
+        setTimeout(() => setShowNewHostAlert(false), 10000); // desaparece após 10s
       }
     }
 

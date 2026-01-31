@@ -224,7 +224,7 @@ export function ResultPhase({
             ) : (
               <>
                 <button className="primary-btn pulse" disabled>
-                  AGUARDE O HOST...
+                  AGUARDE O LÍDER...
                 </button>
                 <button
                   className="secondary-btn"
