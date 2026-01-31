@@ -5,6 +5,8 @@ import { useSocket } from "../../../../contexts/socketContext";
 import { DiscussPhase } from "../components/discussPhase";
 import { VotingPhase } from "../components/votingPhase/VotingPhase";
 import { ResultPhase } from "../components/resultPhase";
+import { SpectatorView } from "./SpectatorView/SpectatorView";
+import { NewHostModal } from "./NewHostAlert/NewHostModal";
 
 export function OnlineImpostorGame() {
   const socket = useSocket();
@@ -12,18 +14,112 @@ export function OnlineImpostorGame() {
   const [gameData, setGameData] = useState<any>(
     location.state?.data || location.state || null,
   );
+  const [showNewHostAlert, setShowNewHostAlert] = useState(false);
 
   useEffect(() => {
-    socket.on("game-update", (data) => {
-      setGameData(data);
-    });
+    setGameData((prev: any) =>
+      prev ? { ...prev, mySocketId: socket.id } : null,
+    );
+  }, [socket.id]);
+
+  useEffect(() => {
+    function onGameUpdate(data: any) {
+      setGameData((prev: any) => {
+        console.log(
+          "[game-update] incoming data:",
+          data,
+          "socketId:",
+          socket.id,
+          "prev:",
+          prev,
+        );
+        if (!data) return data;
+        const isHostFromServer =
+          typeof data.isHost === "boolean"
+            ? data.isHost
+            : data.hostId
+              ? data.hostId === socket.id
+              : false;
+
+        return {
+          ...data,
+          isHost: isHostFromServer,
+          mySocketId: prev?.mySocketId || socket.id,
+        };
+      });
+    }
+
+    function onPlayerLeft({ name, reason }: { name: string; reason: string }) {
+      alert(`${name} saiu do jogo`);
+      console.log(`${name} saiu do jogo. Motivo: ${reason}`);
+    }
+
+    function onForceLobby({ reason }: { reason: string }) {
+      alert("Jogadores insuficientes. Voltando ao lobby.");
+      window.location.href = "/games/impostor/lobby";
+      console.log(`Jogadores Insuficientes:${reason}`);
+    }
+
+    function onHostChanged({ newHostId }: { newHostId: string }) {
+      console.log("Host changed event received. New hostId:", newHostId);
+      console.log("My socket id:", socket.id);
+
+      const isNowHost = socket.id === newHostId;
+
+      setGameData((prev: any) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          isHost: isNowHost,
+          mySocketId: prev.mySocketId || socket.id,
+        };
+      });
+
+      // Mostra aviso se o jogador se tornou host
+      if (isNowHost) {
+        setShowNewHostAlert(true);
+        setTimeout(() => setShowNewHostAlert(false), 40000); // desaparece após 4s
+      }
+    }
+
+    socket.on("game-update", onGameUpdate);
+    socket.on("player-left", onPlayerLeft);
+    socket.on("force-lobby", onForceLobby);
+    socket.on("host-changed", onHostChanged);
 
     return () => {
-      socket.off("game-update");
+      socket.off("game-update", onGameUpdate);
+      socket.off("player-left", onPlayerLeft);
+      socket.off("force-lobby", onForceLobby);
+      socket.off("host-changed", onHostChanged);
     };
   }, [socket]);
 
-  if (!gameData) return <div>Carregando...</div>;
+  // Aviso ao tentar sair/atualizar
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (gameData) {
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [gameData]);
+
+  if (!gameData) return <div>Carregando a nova rodada...</div>;
+
+  // Card de aviso: novo host
+  if (showNewHostAlert) {
+    return <NewHostModal onConfirm={() => setShowNewHostAlert(false)} />;
+  }
+
+  // Espectador - apenas observa
+  if (gameData.isSpectator) {
+    return <SpectatorView gameData={gameData} />;
+  }
 
   function handleExit() {
     // Você pode voltar pro lobby

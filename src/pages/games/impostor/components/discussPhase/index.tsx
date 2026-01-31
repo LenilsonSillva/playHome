@@ -66,7 +66,32 @@ export function DiscussPhase({
   return (
     <div className={styles.container}>
       <div className={styles.glassPanel}>
-        <h1 className={styles.title}>Discussão</h1>
+        {isOnline && data.roomCode ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px",
+            }}
+          >
+            <h1 className={styles.title}>Discussão</h1>
+            <div
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                padding: "4px 12px",
+                borderRadius: "4px",
+                fontSize: "12px",
+                fontFamily: "monospace",
+                color: "var(--text-secondary)",
+              }}
+            >
+              Sala: <strong>{data.roomCode}</strong>
+            </div>
+          </div>
+        ) : (
+          <h1 className={styles.title}>Discussão</h1>
+        )}
 
         <div className={styles.timerContainer}>
           <span className={styles.timerLabel}>TEMPO DECORRIDO</span>

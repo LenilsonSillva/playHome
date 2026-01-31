@@ -37,5 +37,7 @@ export type GameRouteState = {
     twoWordsMode: boolean;
     whoStart: string | undefined;
     phase: ImpostorGameState["phase"];
+    isHost?: boolean;
+    roomCode?: string;
   };
 };

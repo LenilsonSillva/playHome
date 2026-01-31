@@ -8,6 +8,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const s = io("https://playhome-backend.onrender.com");
+    //const s = io("http://localhost:3000");
     setSocket(s);
 
     return () => {

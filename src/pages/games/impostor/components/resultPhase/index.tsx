@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useSocket } from "../../../../../contexts/socketContext";
 import type {
   GameRouteState,
   ImpostorGameState,
@@ -23,6 +24,7 @@ export function ResultPhase({
   isOnline,
 }: DiscussPhaseProps) {
   const navigate = useNavigate();
+  const socket = isOnline ? useSocket() : null;
 
   // 1. Cálculos de sobreviventes
   const alivePlayers = data.players.filter((p) => p.isAlive);
@@ -103,6 +105,18 @@ export function ResultPhase({
                 ? "Todos os impostores foram ejetados da nave."
                 : `A tripulação não tem mais votos suficientes. Restaram ${aliveCrew} tripulante(s).`}
             </p>
+            {isOnline && data.roomCode && (
+              <div
+                style={{
+                  marginTop: "12px",
+                  fontSize: "13px",
+                  fontFamily: "monospace",
+                  color: "rgba(255, 255, 255, 0.7)",
+                }}
+              >
+                Sala: <strong>{data.roomCode}</strong>
+              </div>
+            )}
           </div>
         ) : (
           /* Caso o jogo ainda não tenha acabado (fluxo de segurança) */
@@ -174,17 +188,73 @@ export function ResultPhase({
         {/* AÇÕES FINAIS */}
         <div className="result-actions">
           {gameOver ? (
-            <>
-              <button className="primary-btn pulse" onClick={onNextRound}>
-                PRÓXIMA PALAVRA
-              </button>
-              <button
-                className="secondary-btn"
-                onClick={() => navigate("/games/impostor/lobby")}
-              >
-                VOLTAR AO LOBBY
-              </button>
-            </>
+            !isOnline || (isOnline && data.isHost) ? (
+              <>
+                <button className="primary-btn pulse" onClick={onNextRound}>
+                  PRÓXIMA PALAVRA
+                </button>
+                <button
+                  className="secondary-btn"
+                  onClick={() => {
+                    if (isOnline && socket) {
+                      socket.emit(
+                        "leave-room",
+                        { roomCode: data.roomCode },
+                        () => {
+                          // Remove listeners para limpar o estado
+                          socket.off("room-updated");
+                          socket.off("game-update");
+                          socket.off("player-left");
+                          socket.off("host-changed");
+                          socket.off("force-lobby");
+                          // Aguarda um pouco para garantir que o servidor atualizou
+                          setTimeout(() => {
+                            navigate("/games/impostor/lobby");
+                          }, 100);
+                        },
+                      );
+                    } else {
+                      navigate("/games/impostor/lobby");
+                    }
+                  }}
+                >
+                  SAIR DO JOGO
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="primary-btn pulse" disabled>
+                  AGUARDE O HOST...
+                </button>
+                <button
+                  className="secondary-btn"
+                  onClick={() => {
+                    if (isOnline && socket) {
+                      socket.emit(
+                        "leave-room",
+                        { roomCode: data.roomCode },
+                        () => {
+                          // Remove listeners para limpar o estado
+                          socket.off("room-updated");
+                          socket.off("game-update");
+                          socket.off("player-left");
+                          socket.off("host-changed");
+                          socket.off("force-lobby");
+                          // Aguarda um pouco para garantir que o servidor atualizou
+                          setTimeout(() => {
+                            navigate("/games/impostor/lobby");
+                          }, 100);
+                        },
+                      );
+                    } else {
+                      navigate("/games/impostor/lobby");
+                    }
+                  }}
+                >
+                  SAIR DO JOGO
+                </button>
+              </>
+            )
           ) : (
             <button
               className="primary-btn"

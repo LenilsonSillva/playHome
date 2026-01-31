@@ -10,6 +10,7 @@ export function OnlineImpostorLobby() {
 
   const [name, setName] = useState("");
   const [roomCode, setRoomCode] = useState("");
+  const [lastRoomCode, setLastRoomCode] = useState<string | null>(null);
   const [inRoom, setInRoom] = useState(false);
 
   const [players, setPlayers] = useState<any[]>([]);
@@ -126,6 +127,14 @@ export function OnlineImpostorLobby() {
   }, [players.length, maxImpostors]);
 
   useEffect(() => {
+    // carregar último código de sala conhecido (se houver)
+    try {
+      const stored = localStorage.getItem("lastRoomCode");
+      if (stored) setLastRoomCode(stored);
+    } catch (e) {
+      // ignore
+    }
+
     socket.on("room-updated", (room) => {
       setPlayers(room.players);
       setRoomCode(room.code);
@@ -158,6 +167,12 @@ export function OnlineImpostorLobby() {
     socket.emit("create-room", { name, id, emoji, color }, (res: any) => {
       if (res.error) return alert(res.error);
       setInRoom(true);
+      try {
+        if (res.roomCode) {
+          localStorage.setItem("lastRoomCode", res.roomCode);
+          setLastRoomCode(res.roomCode);
+        }
+      } catch (e) {}
     });
   }
 
@@ -174,6 +189,10 @@ export function OnlineImpostorLobby() {
       (res: any) => {
         if (res.error) return alert(res.error);
         setInRoom(true);
+        try {
+          localStorage.setItem("lastRoomCode", roomCode.toUpperCase());
+          setLastRoomCode(roomCode.toUpperCase());
+        } catch (e) {}
       },
     );
   }
@@ -223,6 +242,27 @@ export function OnlineImpostorLobby() {
           >
             OU
           </div>
+
+          {lastRoomCode && (
+            <div style={{ textAlign: "center", marginBottom: 12 }}>
+              <button
+                className={styles.addButton}
+                onClick={() => {
+                  setRoomCode(lastRoomCode);
+                  try {
+                    navigator.clipboard?.writeText(lastRoomCode);
+                  } catch (e) {}
+                }}
+                style={{
+                  padding: "6px 10px",
+                  marginBottom: 8,
+                  fontSize: "1.4rem",
+                }}
+              >
+                Última sala: {lastRoomCode}
+              </button>
+            </div>
+          )}
 
           <div className={styles.inputGroup}>
             <input

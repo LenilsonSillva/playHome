@@ -171,7 +171,7 @@ export function RevealPhase({
           <h3>STATUS DE PRONTOS</h3>
           {data.allPlayers?.map((p: any) => (
             <div key={p.socketId} className={styles.readyRow}>
-              <span>{p.name}</span>
+              <span>{p.name === player.name ? "VOCÊ" : p.name}</span>
               <span className={p.ready ? styles.ready : styles.notReady}>
                 {p.ready ? "PRONTO" : "NÃO PRONTO"}
               </span>
